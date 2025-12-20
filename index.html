@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Audio Caption Dataset</title>
-  <meta name="description" content="Dataset visualizer and inspector">
+  <title>Dataset Viewer</title>
+  <meta name="description" content="Audio Caption Dataset Visualizer">
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
       <div class="sidebar-header">
         <div class="logo">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-          <span>AudioSet View</span>
+          <span>Dataset View</span>
         </div>
         <div class="badge-count" id="totalCount">Loading...</div>
       </div>
@@ -28,17 +28,16 @@
           <label>搜索内容</label>
           <div class="input-wrapper">
             <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="searchInput" placeholder="Search ID, caption..." autocomplete="off">
+            <input type="text" id="searchInput" placeholder="搜索 ID 或文本..." autocomplete="off">
           </div>
         </div>
 
         <div class="control-group">
           <label>搜索字段</label>
           <select id="searchField">
-            <option value="all">全部字段 (All)</option>
+            <option value="all">全部 (All)</option>
             <option value="id">ID</option>
-            <option value="final_caption">Caption</option>
-            <option value="asr">ASR</option>
+            <option value="final_caption_asr">Final Caption ASR</option>
           </select>
         </div>
 
@@ -63,9 +62,7 @@
     <!-- 主内容区 -->
     <main class="main-content">
       <header class="top-bar">
-        <div class="pagination-info" id="pageInfo">
-          <!-- JS 填充 -->
-        </div>
+        <div class="pagination-info" id="pageInfo">初始化中...</div>
         <div class="pagination-controls">
           <button id="prevBtn" class="btn-icon" disabled><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
           <button id="nextBtn" class="btn-icon" disabled><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
@@ -77,7 +74,7 @@
       </div>
 
       <footer class="footer">
-        <p>Dataset Visualizer · Vanilla JS · <span id="renderTime"></span></p>
+        <p>Dataset Visualizer · Vanilla JS</p>
       </footer>
     </main>
   </div>
@@ -85,6 +82,6 @@
   <!-- Toast 通知组件 -->
   <div id="toast" class="toast hidden">已复制到剪贴板</div>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
