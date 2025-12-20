@@ -1,21 +1,18 @@
 :root {
   /* 调色板 - Dark Modern */
-  --bg-app: #0d1117;       /* 最深背景 */
+  --bg-app: #0d1117;       /* APP 背景 */
   --bg-sidebar: #161b22;   /* 侧边栏背景 */
   --bg-card: #161b22;      /* 卡片背景 */
-  --bg-card-hover: #1f242c;/* 卡片悬停 */
-  --bg-input: #0d1117;
+  --bg-input: #0d1117;     /* 输入框背景 */
   
-  --border: #30363d;       /* 边框色 */
+  --border: #30363d;       /* 边框颜色 */
   --border-active: #58a6ff;
   
   --text-main: #e6edf3;
   --text-muted: #8b949e;
   --text-link: #58a6ff;
   
-  --accent: #238636;       /* 绿色强调 */
-  --accent-bg: rgba(35, 134, 54, 0.15);
-  
+  --accent-bg: rgba(35, 134, 54, 0.15); /* 绿色背景 */
   --highlight: rgba(238, 191, 49, 0.25); /* 搜索高亮背景 */
   
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -34,7 +31,7 @@ body {
   color: var(--text-main);
   font-family: var(--font-sans);
   height: 100vh;
-  overflow: hidden; /* App 风格，禁用 body 滚动 */
+  overflow: hidden; /* 禁用 Body 滚动，使用内部滚动 */
 }
 
 /* 布局框架 */
@@ -117,7 +114,6 @@ input[type="text"], select {
   transition: border-color 0.2s;
 }
 select { padding-left: 12px; cursor: pointer; }
-
 input:focus, select:focus { border-color: var(--border-active); }
 
 .radio-group {
@@ -131,6 +127,7 @@ input:focus, select:focus { border-color: var(--border-active); }
   cursor: pointer;
   text-transform: none;
   color: var(--text-main);
+  font-size: 14px;
 }
 input[type="radio"] { accent-color: var(--text-link); }
 
@@ -274,7 +271,7 @@ audio::-webkit-media-controls-time-remaining-display { color: #fff; }
 
 /* 文本部分 */
 .text-block h4 {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   font-size: 11px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -284,7 +281,9 @@ audio::-webkit-media-controls-time-remaining-display { color: #fff; }
   font-size: 14px;
   line-height: 1.6;
   color: var(--text-main);
-  word-break: break-word;
+  /* 关键样式：防止长文本被截断，保留原有换行 */
+  white-space: pre-wrap;
+  word-break: break-word; 
 }
 /* 搜索高亮样式 */
 mark {
@@ -317,6 +316,8 @@ pre.json-code {
   font-size: 12px;
   margin: 10px 0 0 0;
   border: 1px solid var(--border);
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 /* JSON Syntax Colors */
 .json-key { color: #79c0ff; }
@@ -355,7 +356,7 @@ pre.json-code {
   pointer-events: none;
 }
 
-/* Mobile Responsive */
+/* 移动端响应式 */
 @media (max-width: 900px) {
   .app-layout { flex-direction: column; height: auto; overflow: auto; }
   .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
