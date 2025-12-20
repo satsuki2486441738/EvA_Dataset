@@ -60,4 +60,181 @@
 
             <div class="relative max-w-xl mx-auto">
                 <input type="text" id="searchInput" disabled
-                    class="w-full bg-cardbg border border-slate-700 text-white text-sm round
+                    class="w-full bg-cardbg border border-slate-700 text-white text-sm rounded-full focus:ring-brand focus:border-brand block pl-12 p-4 shadow-lg transition placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed" 
+                    placeholder="正在加载数据... / Loading data...">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-search text-slate-500"></i>
+                </div>
+                <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+                    <span id="countBadge" class="bg-slate-700 text-xs px-2 py-1 rounded-md text-slate-300">...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载中提示 -->
+        <div id="loadingSpinner" class="text-center py-20">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand mb-4"></i>
+            <p class="text-slate-500">正在从 data/samples.json 加载数据...</p>
+        </div>
+
+        <!-- 错误提示 -->
+        <div id="errorMsg" class="hidden text-center py-20 text-red-400">
+            <i class="fa-solid fa-triangle-exclamation text-4xl mb-4"></i>
+            <p>无法加载数据。请确保通过 Web Server (如 GitHub Pages 或 Live Server) 运行此页面。</p>
+        </div>
+
+        <!-- 数据列表 (Grid) -->
+        <div id="dataGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"></div>
+
+        <div id="noResults" class="hidden text-center py-20">
+            <i class="fa-regular fa-face-frown text-4xl text-slate-600 mb-4"></i>
+            <p class="text-slate-500">未找到匹配的结果</p>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-800 mt-12 py-8 text-center text-slate-500 text-sm">
+        <p>&copy; 2024 EvA-Perception Project.</p>
+    </footer>
+
+    <script>
+        // 定义全局变量存储数据
+        let allData = [];
+
+        const grid = document.getElementById('dataGrid');
+        const searchInput = document.getElementById('searchInput');
+        const countBadge = document.getElementById('countBadge');
+        const noResults = document.getElementById('noResults');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // 音频路径修正：映射 /nfs/.../xxxx.wav -> ./audio/xxxx.wav
+        function getWebAudioPath(originalPath) {
+            const filename = originalPath.split('/').pop();
+            return `./audio/${filename}`;
+        }
+
+        // 初始化加载数据
+        async function init() {
+            try {
+                // 请求 data/samples.json
+                const response = await fetch('data/samples.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                allData = await response.json();
+                
+                // 数据加载完成，隐藏 loading，启用搜索
+                loadingSpinner.classList.add('hidden');
+                searchInput.disabled = false;
+                searchInput.placeholder = "搜索 Caption 内容 / Search captions...";
+                
+                // 渲染初始数据
+                renderCards(allData);
+
+            } catch (error) {
+                console.error('Data loading failed:', error);
+                loadingSpinner.classList.add('hidden');
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        // 渲染函数
+        function renderCards(data) {
+            grid.innerHTML = '';
+            countBadge.textContent = `${data.length} Items`;
+
+            if (data.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            data.forEach(item => {
+                const audioSrc = getWebAudioPath(item.audio_path);
+                // 处理可能包含单引号的文本，防止破坏 onclick HTML
+                const safeText = item.final_caption_asr.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                
+                const card = document.createElement('div');
+                card.className = 'bg-cardbg border border-slate-700 rounded-xl overflow-hidden hover:border-slate-500 transition shadow-lg flex flex-col';
+                
+                card.innerHTML = `
+                    <div class="p-5 bg-slate-800/50 border-b border-slate-700">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-mono text-brand bg-brand/10 px-2 py-1 rounded">ID: ${item.id}</span>
+                            <a href="${audioSrc}" download class="text-slate-500 hover:text-brand transition" title="Download Audio">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                        </div>
+                        <audio controls class="audio-player block w-full" preload="none">
+                            <source src="${audioSrc}" type="audio/wav">
+                        </audio>
+                    </div>
+
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">EvA Perception</h3>
+                            <button onclick="copyText(this, '${safeText}')" 
+                                class="text-xs text-slate-500 hover:text-white flex items-center gap-1 transition group">
+                                <i class="fa-regular fa-copy group-hover:scale-110"></i> <span>Copy</span>
+                            </button>
+                        </div>
+                        <p class="text-lg text-slate-100 leading-relaxed font-light mb-4">
+                            "${item.final_caption_asr}"
+                        </p>
+
+                        <div class="mt-auto pt-4 border-t border-slate-700/50">
+                            <details class="group">
+                                <summary class="flex items-center cursor-pointer text-xs text-slate-500 hover:text-brand transition select-none">
+                                    <span class="mr-2">查看原始字段 (Debug)</span>
+                                    <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 space-y-3 text-sm text-slate-400 pl-2 border-l-2 border-slate-700">
+                                    <div>
+                                        <span class="block text-xs text-slate-500 mb-1">ASR Output:</span>
+                                        <p class="italic text-slate-300">"${item.asr}"</p>
+                                    </div>
+                                    <div>
+                                        <span class="block text-xs text-slate-500 mb-1">Original Caption:</span>
+                                        <p class="text-slate-300">"${item.final_caption}"</p>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.copyText = function(btn, text) {
+            // 解码HTML实体以便复制正确的内容
+            const txt = document.createElement("textarea");
+            txt.innerHTML = text;
+            
+            navigator.clipboard.writeText(txt.value).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-check text-green-400"></i> <span class="text-green-400">Copied!</span>`;
+                setTimeout(() => btn.innerHTML = originalHTML, 2000);
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const filtered = allData.filter(item => 
+                (item.final_caption_asr && item.final_caption_asr.toLowerCase().includes(keyword)) || 
+                (item.id && item.id.toLowerCase().includes(keyword)) ||
+                (item.asr && item.asr.toLowerCase().includes(keyword))
+            );
+            renderCards(filtered);
+        });
+
+        // 页面加载时执行
+        init();
+
+    </script>
+</body>
+</html>
