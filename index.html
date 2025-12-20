@@ -1,81 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dataset Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio Caption Dataset</title>
+  <meta name="description" content="Dataset visualizer and inspector">
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="wrap">
-      <div class="topbar-row">
-        <div class="brand">
-          <div class="logo">D</div>
-          <div>
-            <div class="title">Dataset Demo</div>
-            <div class="subtitle">Search · Play · Inspect JSON</div>
+
+  <div class="app-layout">
+    <!-- 侧边栏：控制面板 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+          <span>AudioSet View</span>
+        </div>
+        <div class="badge-count" id="totalCount">Loading...</div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="control-group">
+          <label>搜索内容</label>
+          <div class="input-wrapper">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Search ID, caption..." autocomplete="off">
           </div>
         </div>
 
-        <div class="stats" id="metaTop">—</div>
-      </div>
-
-      <div class="toolbar">
-        <div class="searchbox">
-          <span class="searchIcon">⌕</span>
-          <input id="q" type="search" placeholder="搜索：id / caption / asr / json ..." autocomplete="off" />
+        <div class="control-group">
+          <label>搜索字段</label>
+          <select id="searchField">
+            <option value="all">全部字段 (All)</option>
+            <option value="id">ID</option>
+            <option value="final_caption">Caption</option>
+            <option value="asr">ASR</option>
+          </select>
         </div>
 
-        <select id="field" title="选择搜索字段">
-          <option value="all" selected>全字段</option>
-          <option value="id">只搜 id</option>
-          <option value="final_caption">只搜 final_caption</option>
-          <option value="asr">只搜 asr</option>
-          <option value="final_caption_asr">只搜 final_caption_asr</option>
-          <option value="json">只搜 raw JSON</option>
-        </select>
+        <div class="control-group">
+          <label>每页显示</label>
+          <div class="radio-group">
+            <label><input type="radio" name="pageSize" value="10"> 10</label>
+            <label><input type="radio" name="pageSize" value="20" checked> 20</label>
+            <label><input type="radio" name="pageSize" value="50"> 50</label>
+          </div>
+        </div>
 
-        <select id="pageSize" title="每页条数">
-          <option value="10">每页 10</option>
-          <option value="20" selected>每页 20</option>
-          <option value="50">每页 50</option>
-        </select>
+        <div class="control-group" style="margin-top:auto">
+          <button id="resetBtn" class="btn btn-secondary full-width">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"></path></svg>
+            重置筛选
+          </button>
+        </div>
+      </div>
+    </aside>
 
-        <label class="chip">
-          <input id="autoExpandJson" type="checkbox" />
-          <span>默认展开 JSON</span>
-        </label>
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="pagination-info" id="pageInfo">
+          <!-- JS 填充 -->
+        </div>
+        <div class="pagination-controls">
+          <button id="prevBtn" class="btn-icon" disabled><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+          <button id="nextBtn" class="btn-icon" disabled><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+        </div>
+      </header>
 
-        <button class="btn ghost" id="clear" type="button">清空</button>
+      <div id="gridContainer" class="grid-container">
+        <!-- 卡片将在这里渲染 -->
       </div>
 
-      <div class="meta" id="meta"></div>
-    </div>
-  </header>
+      <footer class="footer">
+        <p>Dataset Visualizer · Vanilla JS · <span id="renderTime"></span></p>
+      </footer>
+    </main>
+  </div>
 
-  <main class="wrap main">
-    <div id="list" class="grid"></div>
+  <!-- Toast 通知组件 -->
+  <div id="toast" class="toast hidden">已复制到剪贴板</div>
 
-    <div class="pager">
-      <button class="btn ghost" id="prev" type="button">上一页</button>
-      <span id="pageInfo" class="pageInfo"></span>
-      <button class="btn ghost" id="next" type="button">下一页</button>
-    </div>
-
-    <div class="footnote">
-      音频规则：优先使用 <code>audio_url</code>；否则从 <code>audio_path</code> 取文件名映射到 <code>./audio/&lt;filename&gt;</code>（音频放在仓库 <code>audio/</code> 目录）。
-      <br/>
-      如果你 JSON 里文本本身写了 <code>...</code>，网页会原样显示；要显示全文请把 JSON 里的字段换成完整文本。
-    </div>
-  </main>
-
-  <footer class="wrap footer">
-    <span>GitHub Pages · Vanilla JS</span>
-  </footer>
-
-  <!-- 改动代码后 v=1 改成 v=2/v=3... 以绕开缓存 -->
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
