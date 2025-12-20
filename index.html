@@ -1,179 +1,64 @@
-const DATA_URL = "./data/samples.json";
-const AUDIO_BASE_URL = "./audio/"; // 如果你用 CDN，填 "https://xxx.com/audio/"
-
-let DATA = [];
-let filtered = [];
-
-const elList = document.getElementById("list");
-const elMeta = document.getElementById("meta");
-const elQ = document.getElementById("q");
-const elField = document.getElementById("field");
-const elPageSize = document.getElementById("pageSize");
-const elPrev = document.getElementById("prev");
-const elNext = document.getElementById("next");
-const elPageInfo = document.getElementById("pageInfo");
-const elMetaTop = document.getElementById("metaTop");
-
-let page = 1;
-
-function escapeHtml(s){
-  return (s ?? "").toString()
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function basename(p){
-  if(!p) return "";
-  const parts = p.toString().split(/[\\/]/);
-  return parts[parts.length - 1] || "";
-}
-
-function inferAudioUrl(item){
-  // 你数据里就是 audio_path
-  const rawPath = item.audio_path || "";
-  const name = basename(rawPath);
-  if(!name) return "";
-
-  // 1) CDN 模式
-  if(AUDIO_BASE_URL){
-    return AUDIO_BASE_URL.replace(/\/+$/,"/") + name;
-  }
-  // 2) docs/audio/ 模式
-  return "audio/" + name;
-}
-
-function pickText(item, field){
-  if(field === "all"){
-    return [item.id, item.final_caption, item.asr, item.final_caption_asr, item._audio_url]
-      .join("\n")
-      .toLowerCase();
-  }
-  return (item[field] ?? "").toString().toLowerCase();
-}
-
-function applyFilter(){
-  const q = elQ.value.trim().toLowerCase();
-  const field = elField.value;
-
-  if(!q) filtered = DATA.slice();
-  else filtered = DATA.filter(it => pickText(it, field).includes(q));
-
-  page = 1;
-  render();
-}
-
-function paginate(arr, page, pageSize){
-  const total = arr.length;
-  const pages = Math.max(1, Math.ceil(total / pageSize));
-  const p = Math.min(Math.max(1, page), pages);
-  const start = (p - 1) * pageSize;
-  return { items: arr.slice(start, start + pageSize), total, pages, page: p };
-}
-
-async function copyToClipboard(text){
-  try{
-    await navigator.clipboard.writeText(text);
-    alert("已复制: " + text);
-  }catch(e){
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    ta.remove();
-    alert("已复制: " + text);
-  }
-}
-
-function renderCard(item){
-  const id = escapeHtml(item.id);
-  const audioUrl = escapeHtml(item._audio_url || "");
-
-  return `
-    <article class="card">
-      <div class="cardHeader">
-        <div class="badge"><span class="id">${id}</span></div>
-        <div class="actions">
-          <button class="btn small" data-copy="${id}">复制ID</button>
-          ${audioUrl ? `<a class="btn small" href="${audioUrl}" target="_blank" rel="noreferrer">打开音频</a>` : ""}
-        </div>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dataset Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="wrap header">
+    <div class="titleRow">
+      <div>
+        <h1>Dataset Demo</h1>
+        <div class="sub">Search / Play / Browse</div>
       </div>
+      <div class="rightMeta" id="metaTop"></div>
+    </div>
 
-      <div class="k">audio_guess（调试）</div>
-      <div class="v">${audioUrl || "<span style='color:var(--muted)'>（空：说明脚本没有推断出音频路径）</span>"}</div>
+    <div class="controls">
+      <input id="q" type="search" placeholder="搜索：id / caption / asr ..." autocomplete="off" />
+      <select id="field" title="选择搜索字段">
+        <option value="all" selected>全字段</option>
+        <option value="id">只搜 id</option>
+        <option value="final_caption">只搜 final_caption</option>
+        <option value="asr">只搜 asr</option>
+        <option value="final_caption_asr">只搜 final_caption_asr</option>
+      </select>
 
-      ${audioUrl ? `
-        <audio controls preload="none">
-          <source src="${audioUrl}">
-          你的浏览器不支持 audio 标签。
-        </audio>
-      ` : ""}
+      <select id="pageSize" title="每页条数">
+        <option value="10">每页 10</option>
+        <option value="20" selected>每页 20</option>
+        <option value="50">每页 50</option>
+      </select>
 
-      <div class="kv">
-        <div class="k">final_caption</div>
-        <div class="v">${escapeHtml(item.final_caption || "")}</div>
+      <button class="btn" id="clear">清空</button>
+    </div>
 
-        <div class="k">asr</div>
-        <div class="v">${escapeHtml(item.asr || "")}</div>
-      </div>
+    <div class="meta" id="meta"></div>
+  </header>
 
-      <details>
-        <summary>展开查看 final_caption_asr</summary>
-        <div class="v" style="margin-top:8px">${escapeHtml(item.final_caption_asr || "")}</div>
-      </details>
-    </article>
-  `;
-}
+  <main class="wrap">
+    <div id="list" class="grid"></div>
 
-function render(){
-  const pageSize = parseInt(elPageSize.value, 10);
-  const { items, total, pages, page: p } = paginate(filtered, page, pageSize);
-  page = p;
+    <div class="pager">
+      <button class="btn" id="prev">上一页</button>
+      <span id="pageInfo" class="pageInfo"></span>
+      <button class="btn" id="next">下一页</button>
+    </div>
 
-  elMeta.textContent = `共 ${DATA.length} 条 | 当前匹配 ${total} 条`;
-  if(elMetaTop) elMetaTop.textContent = `Page ${page}/${pages}`;
-  elList.innerHTML = items.map(renderCard).join("");
+    <div class="hint">
+      <div><b>音频规则</b></div>
+      <div>1) 如果 JSON 里有 <code>audio_url</code>：直接播放该链接</div>
+      <div>2) 否则从 <code>audio_path</code> 取文件名，映射为 <code>./audio/&lt;filename&gt;</code>（需要把音频文件放到仓库的 <code>audio/</code> 目录）</div>
+    </div>
+  </main>
 
-  elPrev.disabled = (page <= 1);
-  elNext.disabled = (page >= pages);
-  elPageInfo.textContent = `第 ${page} / ${pages} 页`;
+  <footer class="wrap footer">
+    <span>GitHub Pages · Vanilla JS</span>
+  </footer>
 
-  elList.querySelectorAll("[data-copy]").forEach(btn => {
-    btn.addEventListener("click", () => copyToClipboard(btn.getAttribute("data-copy")));
-  });
-}
-
-async function main(){
-  const res = await fetch(DATA_URL + `?t=${Date.now()}`, { cache: "no-store" });
-  if(!res.ok){
-    throw new Error(`HTTP ${res.status}：取不到 ${DATA_URL}（确认文件在 docs/data/samples.json）`);
-  }
-  const txt = await res.text();
-  let arr;
-  try{
-    arr = JSON.parse(txt);
-  }catch(e){
-    throw new Error(`JSON 解析失败：${e.message}`);
-  }
-
-  DATA = arr.map(x => ({ ...x, _audio_url: inferAudioUrl(x) }));
-  filtered = DATA.slice();
-  render();
-
-  // 控制台也打印一下，方便你看
-  console.log("First sample:", DATA[0]);
-}
-
-document.getElementById("q").addEventListener("input", applyFilter);
-document.getElementById("field").addEventListener("change", applyFilter);
-document.getElementById("pageSize").addEventListener("change", () => { page = 1; render(); });
-document.getElementById("prev").addEventListener("click", () => { page -= 1; render(); });
-document.getElementById("next").addEventListener("click", () => { page += 1; render(); });
-
-main().catch(err => {
-  console.error(err);
-  elMeta.textContent = "加载失败：" + err.message;
-});
+  <!-- 改代码后把 v=1 改成 v=2/v=3...，避免浏览器缓存旧脚本 -->
+  <script src="script.js?v=1"></script>
+</body>
+</html>
