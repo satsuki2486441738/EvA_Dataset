@@ -103,7 +103,11 @@ input[type="search"]{ flex:1; min-width:240px; }
 .actions{ display:flex; gap:8px; flex-wrap:wrap; }
 .small{ padding:8px 10px; }
 
-audio{ width:100%; margin: 6px 0 2px; }
+audio{
+  display:block !important;
+  width:100% !important;
+  margin: 8px 0 2px;
+}
 
 .kv{
   display:grid;
