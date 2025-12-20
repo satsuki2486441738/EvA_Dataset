@@ -4,103 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EvA-Perception Dataset Explorer</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind 配置 -->
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: '#6366f1', 
-                        darkbg: '#0f172a',
-                        cardbg: '#1e293b'
+                        brand: '#6366f1', // 主题色 Indigo
+                        darkbg: '#0f172a', // 深蓝背景
+                        cardbg: '#1e293b'  // 卡片背景
                     }
                 }
             }
         }
     </script>
     <style>
+        /* 自定义滚动条样式 */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .audio-player { width: 100%; height: 40px; border-radius: 20px; }
+        
+        /* 音频播放器样式微调 */
+        .audio-player { width: 100%; height: 40px; border-radius: 20px; outline: none; }
+        
+        /* 确保长文本换行的关键样式 */
+        .full-text-display {
+            white-space: pre-wrap; /* 保留换行符，并允许自动换行 */
+            word-wrap: break-word; /* 防止长单词溢出 */
+            overflow-wrap: break-word;
+        }
     </style>
 </head>
-<body class="bg-darkbg text-slate-200 min-h-screen font-sans selection:bg-brand selection:text-white">
+<body class="bg-darkbg text-slate-200 min-h-screen font-sans selection:bg-brand selection:text-white flex flex-col">
 
     <!-- 顶部导航 -->
     <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-md border-b border-slate-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+                    <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shadow-lg shadow-brand/20">
                         <i class="fa-solid fa-wave-square text-white"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight">EvA-Perception</span>
+                    <span class="text-xl font-bold tracking-tight text-white">EvA-Perception</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <a href="#" class="text-sm text-slate-400 hover:text-white transition">GitHub</a>
+                    <a href="#" class="text-sm font-medium text-slate-400 hover:text-white transition-colors">Dataset</a>
+                    <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fa-brands fa-github text-xl"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- 主体内容 -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         
+        <!-- 头部区域 -->
         <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">
-                音频感知数据集展示
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+                Audio Perception Explorer
             </h1>
             <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
-                Visualizing <span class="text-brand font-mono">final_caption_asr</span> for audio samples.
+                Visualizing <span class="text-brand font-mono font-semibold">final_caption_asr</span> generation results.
             </p>
 
-            <div class="relative max-w-xl mx-auto">
-                <input type="text" id="searchInput" disabled
-                    class="w-full bg-cardbg border border-slate-700 text-white text-sm rounded-full focus:ring-brand focus:border-brand block pl-12 p-4 shadow-lg transition placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed" 
-                    placeholder="正在加载数据... / Loading data...">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-search text-slate-500"></i>
-                </div>
-                <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                    <span id="countBadge" class="bg-slate-700 text-xs px-2 py-1 rounded-md text-slate-300">...</span>
+            <!-- 搜索框 -->
+            <div class="relative max-w-xl mx-auto group">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand to-purple-600 rounded-full opacity-30 group-hover:opacity-60 transition duration-500 blur"></div>
+                <div class="relative">
+                    <input type="text" id="searchInput" disabled
+                        class="w-full bg-cardbg border border-slate-700 text-white text-sm rounded-full focus:ring-2 focus:ring-brand focus:border-transparent block pl-12 p-4 shadow-xl transition placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed" 
+                        placeholder="正在加载数据... / Loading data...">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-search text-slate-500"></i>
+                    </div>
+                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+                        <span id="countBadge" class="bg-slate-700/50 border border-slate-600 text-xs px-2 py-1 rounded-md text-slate-300">...</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 加载中提示 -->
+        <!-- 加载状态 -->
         <div id="loadingSpinner" class="text-center py-20">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand mb-4"></i>
-            <p class="text-slate-500">正在从 data/samples.json 加载数据...</p>
+            <i class="fa-solid fa-circle-notch fa-spin text-5xl text-brand mb-4"></i>
+            <p class="text-slate-500 animate-pulse">正在读取 data/samples.json ...</p>
         </div>
 
         <!-- 错误提示 -->
-        <div id="errorMsg" class="hidden text-center py-20 text-red-400">
-            <i class="fa-solid fa-triangle-exclamation text-4xl mb-4"></i>
-            <p>无法加载数据。请确保通过 Web Server (如 GitHub Pages 或 Live Server) 运行此页面。</p>
+        <div id="errorMsg" class="hidden text-center py-20 bg-red-900/10 border border-red-900/50 rounded-xl mx-auto max-w-2xl">
+            <i class="fa-solid fa-triangle-exclamation text-4xl text-red-500 mb-4"></i>
+            <h3 class="text-xl font-bold text-red-400 mb-2">数据加载失败</h3>
+            <p class="text-slate-400 text-sm px-4">
+                无法加载 JSON 文件。请确保：<br>
+                1. 文件路径为 <code>data/samples.json</code><br>
+                2. 您是通过 Web Server (如 GitHub Pages, Live Server) 访问，而不是直接双击 HTML 文件。<br>
+                <span class="text-xs opacity-70">(CORS 安全策略限制了本地文件读取)</span>
+            </p>
         </div>
 
-        <!-- 数据列表 (Grid) -->
-        <div id="dataGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"></div>
+        <!-- 数据网格 -->
+        <div id="dataGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
+            <!-- 卡片将通过 JS 动态插入 -->
+        </div>
 
+        <!-- 无搜索结果提示 -->
         <div id="noResults" class="hidden text-center py-20">
-            <i class="fa-regular fa-face-frown text-4xl text-slate-600 mb-4"></i>
-            <p class="text-slate-500">未找到匹配的结果</p>
+            <div class="inline-block p-4 rounded-full bg-slate-800 mb-4">
+                <i class="fa-regular fa-folder-open text-4xl text-slate-600"></i>
+            </div>
+            <p class="text-slate-500">没有找到包含该关键词的样本</p>
         </div>
 
     </main>
 
-    <footer class="border-t border-slate-800 mt-12 py-8 text-center text-slate-500 text-sm">
-        <p>&copy; 2024 EvA-Perception Project.</p>
+    <!-- 页脚 -->
+    <footer class="border-t border-slate-800 py-8 text-center text-slate-600 text-sm bg-darkbg/50">
+        <p>&copy; 2025 EvA-Perception Project. All rights reserved.</p>
     </footer>
 
+    <!-- 逻辑脚本 -->
     <script>
-        // 定义全局变量存储数据
+        // 全局数据存储
         let allData = [];
 
+        // DOM 元素引用
         const grid = document.getElementById('dataGrid');
         const searchInput = document.getElementById('searchInput');
         const countBadge = document.getElementById('countBadge');
@@ -108,17 +143,58 @@
         const loadingSpinner = document.getElementById('loadingSpinner');
         const errorMsg = document.getElementById('errorMsg');
 
-        // 音频路径修正：映射 /nfs/.../xxxx.wav -> ./audio/xxxx.wav
+        // ==========================================
+        // 工具函数
+        // ==========================================
+
+        // 1. 路径修正：将服务器绝对路径转为相对路径
         function getWebAudioPath(originalPath) {
+            if (!originalPath) return '';
+            // 提取文件名 (例如 "Y01Kf9T7o2Zs.wav")
             const filename = originalPath.split('/').pop();
-            return `./audio/${filename}`;
+            // 假设音频文件都在同级目录 audio/ 下
+            return `audio/${filename}`;
         }
 
-        // 初始化加载数据
+        // 2. 复制文本到剪贴板
+        window.copyText = function(btn, text) {
+            // 创建临时 textarea 处理 HTML 实体解码
+            const txt = document.createElement("textarea");
+            txt.innerHTML = text;
+            const decodedText = txt.value;
+            
+            navigator.clipboard.writeText(decodedText).then(() => {
+                const icon = btn.querySelector('i');
+                const span = btn.querySelector('span');
+                const originalIconClass = icon.className;
+                const originalText = span.textContent;
+
+                // 切换为成功状态
+                icon.className = "fa-solid fa-check text-green-400";
+                span.className = "text-green-400 font-medium";
+                span.textContent = "Copied!";
+                
+                // 2秒后恢复
+                setTimeout(() => {
+                    icon.className = originalIconClass;
+                    span.className = "";
+                    span.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed', err);
+                alert("复制失败，请手动复制");
+            });
+        }
+
+        // ==========================================
+        // 核心逻辑
+        // ==========================================
+
+        // 初始化：获取数据
         async function init() {
             try {
-                // 请求 data/samples.json
-                const response = await fetch('data/samples.json');
+                // 添加时间戳防止缓存
+                const response = await fetch(`data/samples.json?t=${new Date().getTime()}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -126,12 +202,15 @@
                 
                 allData = await response.json();
                 
-                // 数据加载完成，隐藏 loading，启用搜索
+                // 隐藏 Loading，显示内容
                 loadingSpinner.classList.add('hidden');
-                searchInput.disabled = false;
-                searchInput.placeholder = "搜索 Caption 内容 / Search captions...";
                 
-                // 渲染初始数据
+                // 启用搜索框
+                searchInput.disabled = false;
+                searchInput.placeholder = "搜索 ID, Caption 或 ASR 内容...";
+                searchInput.focus();
+                
+                // 渲染所有数据
                 renderCards(allData);
 
             } catch (error) {
@@ -141,7 +220,7 @@
             }
         }
 
-// 渲染函数
+        // 渲染卡片列表
         function renderCards(data) {
             grid.innerHTML = '';
             countBadge.textContent = `${data.length} Items`;
@@ -155,56 +234,70 @@
 
             data.forEach(item => {
                 const audioSrc = getWebAudioPath(item.audio_path);
+                // 文本安全处理 (转义引号)
                 const safeText = item.final_caption_asr ? item.final_caption_asr.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
                 
                 const card = document.createElement('div');
-                // 修改点1：卡片样式。flex-col 确保内容垂直排列，h-fit 允许高度自适应
-                card.className = 'bg-cardbg border border-slate-700 rounded-xl overflow-hidden hover:border-slate-500 transition shadow-lg flex flex-col h-fit';
+                // h-fit 确保卡片高度随内容自动撑开
+                card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 shadow-lg hover:shadow-brand/5 flex flex-col h-fit';
                 
                 card.innerHTML = `
-                    <div class="p-5 bg-slate-800/50 border-b border-slate-700">
+                    <!-- 顶部音频控制区 -->
+                    <div class="p-4 bg-slate-800/50 border-b border-slate-700/50">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="text-xs font-mono text-brand bg-brand/10 px-2 py-1 rounded">ID: ${item.id}</span>
-                            <a href="${audioSrc}" download class="text-slate-500 hover:text-brand transition" title="Download Audio">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-mono font-bold text-brand bg-brand/10 px-2 py-1 rounded border border-brand/20">
+                                    ${item.id}
+                                </span>
+                            </div>
+                            <a href="${audioSrc}" download class="text-slate-500 hover:text-white transition-colors p-1" title="Download Audio">
                                 <i class="fa-solid fa-download"></i>
                             </a>
                         </div>
-                        <audio controls class="audio-player block w-full" preload="none">
+                        <audio controls class="audio-player" preload="none">
                             <source src="${audioSrc}" type="audio/wav">
+                            Your browser does not support the audio element.
                         </audio>
                     </div>
 
+                    <!-- 内容区域 -->
                     <div class="p-5 flex-1 flex flex-col">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">EvA Perception</h3>
+                        <!-- 标题栏 -->
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <i class="fa-solid fa-align-left text-brand"></i> EvA Perception
+                            </h3>
                             <button onclick="copyText(this, '${safeText}')" 
-                                class="text-xs text-slate-500 hover:text-white flex items-center gap-1 transition group">
-                                <i class="fa-regular fa-copy group-hover:scale-110"></i> <span>Copy</span>
+                                class="text-xs text-slate-500 hover:text-white flex items-center gap-1.5 transition-colors group px-2 py-1 rounded hover:bg-slate-700">
+                                <i class="fa-regular fa-copy group-hover:scale-110 transition-transform"></i> 
+                                <span>Copy</span>
                             </button>
                         </div>
                         
-                        <!-- 修改点2：核心文本展示区 -->
-                        <!-- whitespace-pre-wrap: 保留原始的换行符并自动换行 -->
-                        <!-- break-words: 防止超长单词(如URL)撑破布局 -->
-                        <!-- text-justify: 让大段文字看起来更整齐（可选） -->
-                        <div class="text-lg text-slate-100 leading-relaxed font-light mb-4 whitespace-pre-wrap break-words text-justify">
-                            ${item.final_caption_asr}
+                        <!-- 核心文本展示 (Full Text) -->
+                        <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light mb-6">
+                            ${item.final_caption_asr || '<span class="text-slate-600 italic">No content</span>'}
                         </div>
 
+                        <!-- 底部折叠详情 -->
                         <div class="mt-auto pt-4 border-t border-slate-700/50">
                             <details class="group">
-                                <summary class="flex items-center cursor-pointer text-xs text-slate-500 hover:text-brand transition select-none">
-                                    <span class="mr-2">查看原始字段 (Debug)</span>
-                                    <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform"></i>
+                                <summary class="flex items-center cursor-pointer text-xs font-medium text-slate-500 hover:text-brand transition-colors select-none py-1">
+                                    <span class="mr-2">查看原始字段 (Debug Info)</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] group-open:rotate-180 transition-transform duration-300"></i>
                                 </summary>
-                                <div class="mt-3 space-y-3 text-sm text-slate-400 pl-2 border-l-2 border-slate-700">
+                                
+                                <div class="mt-3 space-y-4 text-sm text-slate-400 pl-3 border-l-2 border-slate-700 animate-fade-in">
                                     <div>
-                                        <span class="block text-xs text-slate-500 mb-1">ASR Output:</span>
-                                        <p class="italic text-slate-300 whitespace-pre-wrap break-words">"${item.asr}"</p>
+                                        <span class="block text-xs font-mono text-slate-500 mb-1">ASR Output</span>
+                                        <p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.asr}"</p>
                                     </div>
                                     <div>
-                                        <span class="block text-xs text-slate-500 mb-1">Original Caption:</span>
-                                        <p class="text-slate-300 whitespace-pre-wrap break-words">"${item.final_caption}"</p>
+                                        <span class="block text-xs font-mono text-slate-500 mb-1">Original Final Caption</span>
+                                        <p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.final_caption}"</p>
+                                    </div>
+                                    <div class="text-xs text-slate-600 font-mono break-all">
+                                        Source: ${item.audio_path}
                                     </div>
                                 </div>
                             </details>
@@ -215,31 +308,18 @@
             });
         }
 
-        window.copyText = function(btn, text) {
-            // 解码HTML实体以便复制正确的内容
-            const txt = document.createElement("textarea");
-            txt.innerHTML = text;
-            
-            navigator.clipboard.writeText(txt.value).then(() => {
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = `<i class="fa-solid fa-check text-green-400"></i> <span class="text-green-400">Copied!</span>`;
-                setTimeout(() => btn.innerHTML = originalHTML, 2000);
-            });
-        }
-
+        // 搜索过滤逻辑
         searchInput.addEventListener('input', (e) => {
-            const keyword = e.target.value.toLowerCase();
-            const filtered = allData.filter(item => 
-                (item.final_caption_asr && item.final_caption_asr.toLowerCase().includes(keyword)) || 
-                (item.id && item.id.toLowerCase().includes(keyword)) ||
-                (item.asr && item.asr.toLowerCase().includes(keyword))
-            );
-            renderCards(filtered);
-        });
+            const keyword = e.target.value.toLowerCase().trim();
+            
+            if (!keyword) {
+                renderCards(allData);
+                return;
+            }
 
-        // 页面加载时执行
-        init();
-
-    </script>
-</body>
-</html>
+            const filtered = allData.filter(item => {
+                const textMatch = (val) => val && val.toLowerCase().includes(keyword);
+                return textMatch(item.final_caption_asr) || 
+                       textMatch(item.id) || 
+                       textMatch(item.asr);
+            });
