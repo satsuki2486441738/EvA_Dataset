@@ -1,0 +1,57 @@
+body {
+    margin: 0;
+    font-family: system-ui;
+    background: #0b0d12;
+    color: #e8ecf3;
+}
+
+.wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 18px;
+}
+
+.controls input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #2a3144;
+    background: #121622;
+    color: #e8ecf3;
+}
+
+.meta {
+    margin-top: 10px;
+    color: #a8b0c2;
+    font-size: 13px;
+}
+
+.grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.card {
+    background: #121622;
+    border: 1px solid #232a3a;
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.id {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.k {
+    color: #a8b0c2;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.v {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 13px;
+    line-height: 1.5;
+}
