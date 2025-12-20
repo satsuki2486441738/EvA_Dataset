@@ -1,278 +1,291 @@
-// ===== 配置 =====
-const DATA_URL = "./data/samples.json";
-const AUDIO_DIR = "./audio/"; // audio/ 文件夹在仓库根目录下
+// ===== 配置区 =====
+const CONFIG = {
+  dataUrl: "./data/samples.json",
+  audioBaseDir: "./audio/",
+  itemsPerPage: 20,
+};
 
-// ===== 状态 =====
-let DATA = [];
-let filtered = [];
-let page = 1;
+// ===== 状态管理 =====
+const state = {
+  rawData: [],
+  filteredData: [],
+  currentPage: 1,
+  pageSize: CONFIG.itemsPerPage,
+  searchQuery: "",
+  searchField: "all",
+};
 
-// ===== 元素 =====
-const elList = document.getElementById("list");
-const elMeta = document.getElementById("meta");
-const elMetaTop = document.getElementById("metaTop");
-
-const elQ = document.getElementById("q");
-const elField = document.getElementById("field");
-const elPageSize = document.getElementById("pageSize");
-const elPrev = document.getElementById("prev");
-const elNext = document.getElementById("next");
-const elPageInfo = document.getElementById("pageInfo");
-const elClear = document.getElementById("clear");
-const elAutoExpandJson = document.getElementById("autoExpandJson");
+// ===== DOM 元素缓存 =====
+const els = {
+  grid: document.getElementById("gridContainer"),
+  pageInfo: document.getElementById("pageInfo"),
+  prevBtn: document.getElementById("prevBtn"),
+  nextBtn: document.getElementById("nextBtn"),
+  searchInput: document.getElementById("searchInput"),
+  searchField: document.getElementById("searchField"),
+  totalCount: document.getElementById("totalCount"),
+  radioPageSizes: document.querySelectorAll('input[name="pageSize"]'),
+  resetBtn: document.getElementById("resetBtn"),
+  toast: document.getElementById("toast"),
+};
 
 // ===== 工具函数 =====
-function escapeHtml(s){
-  return (s ?? "").toString()
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
 
-function basename(p){
-  if(!p) return "";
-  const parts = p.toString().split(/[\\/]/);
-  return parts[parts.length - 1] || "";
-}
+// 获取文件名
+const getBasename = (path) => {
+  if (!path) return "";
+  return path.split(/[\\/]/).pop();
+};
 
-function inferAudioUrl(item){
-  if(item.audio_url) return item.audio_url;
+// 推断音频 URL
+const getAudioUrl = (item) => {
+  // 优先使用 audio_url
+  if (item.audio_url) return item.audio_url;
+  // 其次从 audio_path 推断
+  const filename = getBasename(item.audio_path);
+  if (filename) return CONFIG.audioBaseDir + filename;
+  return null;
+};
 
-  const name = basename(item.audio_path);
-  if(!name) return "";
-  return AUDIO_DIR + name;
-}
+// 简单的 JSON 语法高亮
+const syntaxHighlight = (json) => {
+  if (typeof json !== 'string') {
+    json = JSON.stringify(json, undefined, 2);
+  }
+  json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    let cls = 'json-number';
+    if (/^"/.test(match)) {
+      if (/:$/.test(match)) {
+        cls = 'json-key';
+      } else {
+        cls = 'json-string';
+      }
+    } else if (/true|false/.test(match)) {
+      cls = 'json-boolean';
+    } else if (/null/.test(match)) {
+      cls = 'json-null';
+    }
+    return '<span class="' + cls + '">' + match + '</span>';
+  });
+};
 
-function paginate(arr, page, pageSize){
-  const total = arr.length;
-  const pages = Math.max(1, Math.ceil(total / pageSize));
-  const p = Math.min(Math.max(1, page), pages);
-  const start = (p - 1) * pageSize;
-  return { items: arr.slice(start, start + pageSize), total, pages, page: p };
-}
+// 文本高亮
+const highlightText = (text, query) => {
+  if (!query || !text) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi");
+  return text.toString().replace(regex, "<mark>$1</mark>");
+};
 
-async function copyToClipboard(text){
-  try{
+// 复制到剪贴板
+const copyToClipboard = async (text) => {
+  try {
     await navigator.clipboard.writeText(text);
-    toast("已复制");
-  }catch{
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    ta.remove();
-    toast("已复制");
+    showToast("已复制到剪贴板");
+  } catch (err) {
+    showToast("复制失败");
+  }
+};
+
+const showToast = (msg) => {
+  els.toast.textContent = msg;
+  els.toast.classList.remove("hidden");
+  setTimeout(() => els.toast.classList.add("hidden"), 2000);
+};
+
+// ===== 核心逻辑 =====
+
+// 初始化
+async function init() {
+  try {
+    const res = await fetch(CONFIG.dataUrl + `?t=${Date.now()}`);
+    if (!res.ok) throw new Error("无法加载数据");
+    const data = await res.json();
+    
+    if (!Array.isArray(data)) throw new Error("数据格式错误，应为数组");
+
+    // 预处理数据：增加 _audio_url 字段
+    state.rawData = data.map(item => ({
+      ...item,
+      _audio_url: getAudioUrl(item)
+    }));
+    
+    // 初始全量数据
+    state.filteredData = [...state.rawData];
+    
+    render();
+    setupEventListeners();
+  } catch (e) {
+    els.grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff7b72;">错误: ${e.message}</div>`;
   }
 }
 
-// 极简 toast（不用额外库）
-let toastTimer = null;
-function toast(msg){
-  clearTimeout(toastTimer);
-  let el = document.getElementById("__toast");
-  if(!el){
-    el = document.createElement("div");
-    el.id = "__toast";
-    el.style.position = "fixed";
-    el.style.left = "50%";
-    el.style.bottom = "22px";
-    el.style.transform = "translateX(-50%)";
-    el.style.padding = "10px 12px";
-    el.style.border = "1px solid rgba(255,255,255,0.10)";
-    el.style.borderRadius = "999px";
-    el.style.background = "rgba(0,0,0,0.55)";
-    el.style.backdropFilter = "blur(10px)";
-    el.style.color = "rgba(233,238,248,0.95)";
-    el.style.fontSize = "12px";
-    el.style.zIndex = "9999";
-    document.body.appendChild(el);
-  }
-  el.textContent = msg;
-  el.style.opacity = "1";
-  toastTimer = setTimeout(() => { el.style.opacity = "0"; }, 900);
-}
+// 过滤逻辑
+function applyFilter() {
+  const q = state.searchQuery.toLowerCase().trim();
+  const field = state.searchField;
 
-function stableStringify(obj){
-  // 为了展示“完整 JSON”，这里保留所有字段（包括 audio_path 等）
-  // 如果你不想展示派生字段，可以在这里删掉 _audio_url
-  return JSON.stringify(obj, null, 2);
-}
-
-function pickText(item, field){
-  if(field === "json"){
-    return stableStringify(item).toLowerCase();
+  if (!q) {
+    state.filteredData = [...state.rawData];
+  } else {
+    state.filteredData = state.rawData.filter(item => {
+      if (field === "all") {
+        return (
+          (item.id && item.id.toLowerCase().includes(q)) ||
+          (item.final_caption && item.final_caption.toLowerCase().includes(q)) ||
+          (item.asr && item.asr.toLowerCase().includes(q)) ||
+          (JSON.stringify(item).toLowerCase().includes(q))
+        );
+      } else {
+        return item[field] && item[field].toString().toLowerCase().includes(q);
+      }
+    });
   }
 
-  if(field === "all"){
-    return [
-      item.id,
-      item.final_caption,
-      item.asr,
-      item.final_caption_asr,
-      item.audio_path,
-      item.audio_url,
-      item._audio_url
-    ].join("\n").toLowerCase();
-  }
-
-  return (item[field] ?? "").toString().toLowerCase();
+  // 重置回第一页
+  state.currentPage = 1;
+  render();
 }
 
-// ===== 渲染 =====
-function renderCard(item){
-  const id = escapeHtml(item.id);
-  const audioUrl = escapeHtml(item._audio_url || "");
-  const hasAudio = Boolean(item._audio_url);
+// 渲染主函数
+function render() {
+  // 更新统计
+  els.totalCount.textContent = `${state.filteredData.length} Items`;
+  
+  // 计算分页
+  const start = (state.currentPage - 1) * state.pageSize;
+  const end = start + state.pageSize;
+  const pageItems = state.filteredData.slice(start, end);
+  const totalPages = Math.ceil(state.filteredData.length / state.pageSize) || 1;
 
-  const finalCaption = escapeHtml(item.final_caption || "");
-  const asr = escapeHtml(item.asr || "");
-  const finalCaptionAsr = escapeHtml(item.final_caption_asr || "");
+  // 渲染分页控件状态
+  els.pageInfo.textContent = `Page ${state.currentPage} of ${totalPages} (Total ${state.filteredData.length})`;
+  els.prevBtn.disabled = state.currentPage === 1;
+  els.nextBtn.disabled = state.currentPage === totalPages;
 
-  const rawJson = escapeHtml(stableStringify(item));
-  const openJson = elAutoExpandJson?.checked ? "open" : "";
+  // 渲染卡片
+  if (pageItems.length === 0) {
+    els.grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">无匹配结果</div>`;
+    return;
+  }
+
+  els.grid.innerHTML = pageItems.map(item => createCardHTML(item)).join("");
+  
+  // 重新绑定卡片内部事件（如 JSON 复制）
+  document.querySelectorAll(".copy-json-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const id = e.target.closest("button").dataset.id;
+      const item = state.rawData.find(i => i.id === id);
+      copyToClipboard(JSON.stringify(item, null, 2));
+    });
+  });
+
+  document.querySelectorAll(".card-id").forEach(el => {
+    el.addEventListener("click", (e) => copyToClipboard(e.target.innerText));
+  });
+}
+
+// 生成单张卡片 HTML
+function createCardHTML(item) {
+  const q = state.searchQuery.trim();
+  const hasAudio = !!item._audio_url;
+  
+  const captionHtml = highlightText(item.final_caption || "N/A", q);
+  const asrHtml = highlightText(item.asr || "N/A", q);
+  const jsonHtml = syntaxHighlight(item);
 
   return `
     <article class="card">
-      <div class="cardHeader">
-        <div class="badge">
-          <span class="id">${id}</span>
-        </div>
-
-        <div class="actions">
-          <button class="btn ghost" data-copy="${id}" type="button">复制ID</button>
-          <button class="btn primary" data-copyjson="${id}" type="button">复制JSON</button>
-          ${hasAudio ? `<a class="btn ghost" href="${audioUrl}" target="_blank" rel="noreferrer">打开音频</a>` : ""}
-          ${hasAudio ? `<a class="btn ghost" href="${audioUrl}" download>下载</a>` : ""}
+      <div class="card-header">
+        <span class="card-id" title="点击复制 ID">${highlightText(item.id, q)}</span>
+        <div class="card-actions">
+          ${hasAudio ? `<a href="${item._audio_url}" download class="action-btn" title="下载音频"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>` : ''}
+          <button class="action-btn copy-json-btn" data-id="${item.id}" title="复制 JSON">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
         </div>
       </div>
 
-      <div class="section">
-        <div class="k">audio_url（推断/直给）</div>
-        <div class="v">${hasAudio ? audioUrl : "<span style='color:var(--muted)'>（无音频：缺少 audio_path/audio_url 或文件未放入 audio/）</span>"}</div>
-
-        ${hasAudio ? `
-          <audio controls preload="none">
-            <source src="${audioUrl}">
-            你的浏览器不支持 audio 标签。
-          </audio>
-        ` : ""}
+      <div class="audio-wrapper">
+        ${hasAudio 
+          ? `<audio controls preload="none" src="${item._audio_url}"></audio>`
+          : `<div style="padding:10px; font-size:12px; color:var(--text-muted); text-align:center;">无音频文件</div>`
+        }
       </div>
 
-      <div class="section">
-        <div class="k">final_caption</div>
-        <div class="v">${finalCaption || "<span style='color:var(--muted)'>（空）</span>"}</div>
+      <div class="text-block">
+        <h4>Caption</h4>
+        <div class="text-content">${captionHtml}</div>
       </div>
 
-      <div class="section">
-        <div class="k">asr</div>
-        <div class="v">${asr || "<span style='color:var(--muted)'>（空）</span>"}</div>
+      <div class="text-block">
+        <h4>ASR</h4>
+        <div class="text-content" style="color:var(--text-muted)">${asrHtml}</div>
       </div>
 
-      <div class="section">
-        <div class="k">final_caption_asr</div>
-        <div class="v">${finalCaptionAsr || "<span style='color:var(--muted)'>（空）</span>"}</div>
-      </div>
-
-      <details ${openJson}>
-        <summary>Raw JSON（完整内容）</summary>
-        <pre class="json">${rawJson}</pre>
+      <details class="json-box">
+        <summary>View Raw JSON</summary>
+        <pre class="json-code"><code>${jsonHtml}</code></pre>
       </details>
     </article>
   `;
 }
 
-function render(){
-  const pageSize = parseInt(elPageSize.value, 10);
-  const { items, total, pages, page: p } = paginate(filtered, page, pageSize);
-  page = p;
-
-  elMeta.textContent = `共 ${DATA.length} 条 | 当前匹配 ${total} 条`;
-  elMetaTop.textContent = `Page ${page}/${pages}`;
-
-  elList.innerHTML = items.map(renderCard).join("");
-
-  elPrev.disabled = (page <= 1);
-  elNext.disabled = (page >= pages);
-  elPageInfo.textContent = `第 ${page} / ${pages} 页`;
-
-  // 绑定复制按钮
-  elList.querySelectorAll("[data-copy]").forEach(btn => {
-    btn.addEventListener("click", () => copyToClipboard(btn.getAttribute("data-copy")));
+// 事件监听设置
+function setupEventListeners() {
+  // 搜索输入（防抖）
+  let debounceTimer;
+  els.searchInput.addEventListener("input", (e) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      state.searchQuery = e.target.value;
+      applyFilter();
+    }, 300);
   });
 
-  // 绑定复制 JSON：通过 id 找到对应 item
-  elList.querySelectorAll("[data-copyjson]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-copyjson");
-      const item = DATA.find(x => x.id === id);
-      if(!item) return toast("未找到该条目");
-      copyToClipboard(stableStringify(item));
+  // 搜索字段切换
+  els.searchField.addEventListener("change", (e) => {
+    state.searchField = e.target.value;
+    applyFilter();
+  });
+
+  // 每页条数切换
+  els.radioPageSizes.forEach(radio => {
+    radio.addEventListener("change", (e) => {
+      state.pageSize = parseInt(e.target.value);
+      state.currentPage = 1;
+      render();
+      els.grid.scrollTop = 0; // 回到顶部
     });
   });
+
+  // 翻页
+  els.prevBtn.addEventListener("click", () => {
+    if (state.currentPage > 1) {
+      state.currentPage--;
+      render();
+      els.grid.scrollTop = 0;
+    }
+  });
+
+  els.nextBtn.addEventListener("click", () => {
+    const totalPages = Math.ceil(state.filteredData.length / state.pageSize);
+    if (state.currentPage < totalPages) {
+      state.currentPage++;
+      render();
+      els.grid.scrollTop = 0;
+    }
+  });
+
+  // 重置
+  els.resetBtn.addEventListener("click", () => {
+    els.searchInput.value = "";
+    state.searchQuery = "";
+    state.searchField = "all";
+    els.searchField.value = "all";
+    applyFilter();
+  });
 }
-
-// ===== 交互 =====
-function applyFilter(){
-  const q = elQ.value.trim().toLowerCase();
-  const field = elField.value;
-
-  if(!q){
-    filtered = DATA.slice();
-  }else{
-    filtered = DATA.filter(it => pickText(it, field).includes(q));
-  }
-
-  page = 1;
-  render();
-}
-
-async function main(){
-  const res = await fetch(DATA_URL + `?t=${Date.now()}`, { cache: "no-store" });
-  if(!res.ok){
-    throw new Error(`HTTP ${res.status}：取不到 ${DATA_URL}（检查 data/samples.json 是否存在/大小写）`);
-  }
-
-  const txt = await res.text();
-  let arr;
-  try{
-    arr = JSON.parse(txt);
-  }catch(e){
-    throw new Error(`JSON 解析失败：${e.message}`);
-  }
-
-  if(!Array.isArray(arr)){
-    throw new Error("samples.json 顶层必须是数组（[...]）");
-  }
-
-  // 保留原始字段，并添加派生字段 _audio_url 供页面使用
-  DATA = arr.map(x => ({
-    ...x,
-    _audio_url: inferAudioUrl(x)
-  }));
-
-  filtered = DATA.slice();
-  render();
-}
-
-// 绑定事件
-elQ.addEventListener("input", applyFilter);
-elField.addEventListener("change", applyFilter);
-elPageSize.addEventListener("change", () => { page = 1; render(); });
-elPrev.addEventListener("click", () => { page -= 1; render(); });
-elNext.addEventListener("click", () => { page += 1; render(); });
-elClear.addEventListener("click", () => {
-  elQ.value = "";
-  elField.value = "all";
-  applyFilter();
-});
-elAutoExpandJson.addEventListener("change", () => render());
 
 // 启动
-main().catch(err => {
-  console.error(err);
-  elMeta.textContent = "加载失败：" + err.message;
-  elMetaTop.textContent = "Error";
-});
+init();
