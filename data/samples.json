@@ -1,16 +1,15 @@
 [
-    {
-        "id": "01Kf9T7o2Zs",
-        "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/Y01Kf9T7o2Zs.wav",
-        "final_caption": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout...",
-        "asr": "Music.",
-        "final_caption_asr": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout..."
-    },
-    {
-        "id": "NtWI0hZVg-k",
-        "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/YNtWI0hZVg-k.wav",
-        "final_caption": "A low, persistent mechanical whirring sound dominates the entire duration...",
-        "asr": "Based on my experience, she didn't have to be too patient. But, John, former newlyweds.",
-        "final_caption_asr": "A low, persistent mechanical whirring sound dominates the entire duration..."
-    }
-]   
+  {
+    "id": "01Kf9T7o2Zs",
+    "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/Y01Kf9T7o2Zs.wav",
+    "final_caption": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out.",
+    "asr": "Music.",
+    "final_caption_asr": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out."
+  },
+  {
+    "id": "NtWI0hZVg-k",
+    "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/YNtWI0hZVg-k.wav",
+    "final_caption": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking amidst the ongoing background whir, his mid-range vocals occasionally punctuated by rhythmic impacts and a soft tap near the end. Conversational exchanges continue throughout the latter half, with overlapping speech patterns suggesting multiple participants, while the steady mechanical sound persists until the audio concludes.",
+    "asr": "Based on my experience, she didn't have to be too patient. But, John, former newlyweds.",
+    "final_caption_asr": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking in likely English amidst the ongoing background whir, saying, “Based on my experience, she didn't have to be too patient. But, John, former newlyweds.” His mid-range vocals are occasionally punctuated by rhythmic impacts and a soft tap near the end. Conversational exchanges continue throughout the latter half, with overlapping speech patterns suggesting multiple participants, while the steady mechanical sound persists until the audio concludes."
+  },
