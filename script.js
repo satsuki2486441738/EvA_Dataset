@@ -30,54 +30,32 @@ const els = {
 };
 
 // ===== 工具函数 =====
+const getBasename = (path) => path ? path.split(/[\\/]/).pop() : "";
 
-// 获取文件名
-const getBasename = (path) => {
-  if (!path) return "";
-  return path.split(/[\\/]/).pop();
-};
-
-// 推断音频 URL
 const getAudioUrl = (item) => {
-  // 优先使用 audio_url
   if (item.audio_url) return item.audio_url;
-  // 其次从 audio_path 推断
   const filename = getBasename(item.audio_path);
-  if (filename) return CONFIG.audioBaseDir + filename;
-  return null;
+  return filename ? CONFIG.audioBaseDir + filename : null;
 };
 
-// 简单的 JSON 语法高亮
 const syntaxHighlight = (json) => {
-  if (typeof json !== 'string') {
-    json = JSON.stringify(json, undefined, 2);
-  }
+  if (typeof json !== 'string') json = JSON.stringify(json, undefined, 2);
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
     let cls = 'json-number';
-    if (/^"/.test(match)) {
-      if (/:$/.test(match)) {
-        cls = 'json-key';
-      } else {
-        cls = 'json-string';
-      }
-    } else if (/true|false/.test(match)) {
-      cls = 'json-boolean';
-    } else if (/null/.test(match)) {
-      cls = 'json-null';
-    }
-    return '<span class="' + cls + '">' + match + '</span>';
+    if (/^"/.test(match)) cls = /:$/.test(match) ? 'json-key' : 'json-string';
+    else if (/true|false/.test(match)) cls = 'json-boolean';
+    else if (/null/.test(match)) cls = 'json-null';
+    return `<span class="${cls}">${match}</span>`;
   });
 };
 
-// 文本高亮
 const highlightText = (text, query) => {
   if (!query || !text) return text;
   const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi");
   return text.toString().replace(regex, "<mark>$1</mark>");
 };
 
-// 复制到剪贴板
 const copyToClipboard = async (text) => {
   try {
     await navigator.clipboard.writeText(text);
@@ -94,25 +72,19 @@ const showToast = (msg) => {
 };
 
 // ===== 核心逻辑 =====
-
-// 初始化
 async function init() {
   try {
     const res = await fetch(CONFIG.dataUrl + `?t=${Date.now()}`);
     if (!res.ok) throw new Error("无法加载数据");
     const data = await res.json();
-    
     if (!Array.isArray(data)) throw new Error("数据格式错误，应为数组");
 
-    // 预处理数据：增加 _audio_url 字段
     state.rawData = data.map(item => ({
       ...item,
       _audio_url: getAudioUrl(item)
     }));
     
-    // 初始全量数据
     state.filteredData = [...state.rawData];
-    
     render();
     setupEventListeners();
   } catch (e) {
@@ -120,7 +92,6 @@ async function init() {
   }
 }
 
-// 过滤逻辑
 function applyFilter() {
   const q = state.searchQuery.toLowerCase().trim();
   const field = state.searchField;
@@ -129,41 +100,39 @@ function applyFilter() {
     state.filteredData = [...state.rawData];
   } else {
     state.filteredData = state.rawData.filter(item => {
+      // 辅助函数：安全获取字段并转小写
+      const val = (k) => (item[k] || "").toString().toLowerCase();
+
       if (field === "all") {
         return (
-          (item.id && item.id.toLowerCase().includes(q)) ||
-          (item.final_caption && item.final_caption.toLowerCase().includes(q)) ||
-          (item.asr && item.asr.toLowerCase().includes(q)) ||
-          (JSON.stringify(item).toLowerCase().includes(q))
+          val("id").includes(q) ||
+          val("final_caption_asr").includes(q) || // 重点搜索这个字段
+          val("final_caption").includes(q) ||
+          val("asr").includes(q) ||
+          JSON.stringify(item).toLowerCase().includes(q)
         );
       } else {
-        return item[field] && item[field].toString().toLowerCase().includes(q);
+        return val(field).includes(q);
       }
     });
   }
 
-  // 重置回第一页
   state.currentPage = 1;
   render();
 }
 
-// 渲染主函数
 function render() {
-  // 更新统计
   els.totalCount.textContent = `${state.filteredData.length} Items`;
   
-  // 计算分页
   const start = (state.currentPage - 1) * state.pageSize;
   const end = start + state.pageSize;
   const pageItems = state.filteredData.slice(start, end);
   const totalPages = Math.ceil(state.filteredData.length / state.pageSize) || 1;
 
-  // 渲染分页控件状态
   els.pageInfo.textContent = `Page ${state.currentPage} of ${totalPages} (Total ${state.filteredData.length})`;
   els.prevBtn.disabled = state.currentPage === 1;
   els.nextBtn.disabled = state.currentPage === totalPages;
 
-  // 渲染卡片
   if (pageItems.length === 0) {
     els.grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">无匹配结果</div>`;
     return;
@@ -171,7 +140,7 @@ function render() {
 
   els.grid.innerHTML = pageItems.map(item => createCardHTML(item)).join("");
   
-  // 重新绑定卡片内部事件（如 JSON 复制）
+  // 绑定事件
   document.querySelectorAll(".copy-json-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       const id = e.target.closest("button").dataset.id;
@@ -185,13 +154,13 @@ function render() {
   });
 }
 
-// 生成单张卡片 HTML
 function createCardHTML(item) {
   const q = state.searchQuery.trim();
   const hasAudio = !!item._audio_url;
   
-  const captionHtml = highlightText(item.final_caption || "N/A", q);
-  const asrHtml = highlightText(item.asr || "N/A", q);
+  // 这里只提取 final_caption_asr
+  const fullCaption = item.final_caption_asr || item.final_caption || ""; 
+  const captionHtml = highlightText(fullCaption, q);
   const jsonHtml = syntaxHighlight(item);
 
   return `
@@ -213,14 +182,10 @@ function createCardHTML(item) {
         }
       </div>
 
+      <!-- 单一的 Caption 展示区域 -->
       <div class="text-block">
-        <h4>Caption</h4>
-        <div class="text-content">${captionHtml}</div>
-      </div>
-
-      <div class="text-block">
-        <h4>ASR</h4>
-        <div class="text-content" style="color:var(--text-muted)">${asrHtml}</div>
+        <h4>Final Caption ASR</h4>
+        <div class="text-content full-text">${captionHtml}</div>
       </div>
 
       <details class="json-box">
@@ -231,9 +196,7 @@ function createCardHTML(item) {
   `;
 }
 
-// 事件监听设置
 function setupEventListeners() {
-  // 搜索输入（防抖）
   let debounceTimer;
   els.searchInput.addEventListener("input", (e) => {
     clearTimeout(debounceTimer);
@@ -243,23 +206,20 @@ function setupEventListeners() {
     }, 300);
   });
 
-  // 搜索字段切换
   els.searchField.addEventListener("change", (e) => {
     state.searchField = e.target.value;
     applyFilter();
   });
 
-  // 每页条数切换
   els.radioPageSizes.forEach(radio => {
     radio.addEventListener("change", (e) => {
       state.pageSize = parseInt(e.target.value);
       state.currentPage = 1;
       render();
-      els.grid.scrollTop = 0; // 回到顶部
+      els.grid.scrollTop = 0;
     });
   });
 
-  // 翻页
   els.prevBtn.addEventListener("click", () => {
     if (state.currentPage > 1) {
       state.currentPage--;
@@ -277,7 +237,6 @@ function setupEventListeners() {
     }
   });
 
-  // 重置
   els.resetBtn.addEventListener("click", () => {
     els.searchInput.value = "";
     state.searchQuery = "";
@@ -287,5 +246,4 @@ function setupEventListeners() {
   });
 }
 
-// 启动
 init();
