@@ -6,51 +6,68 @@
   <title>Dataset Demo</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <header class="wrap header">
-    <div class="titleRow">
-      <div>
-        <h1>Dataset Demo</h1>
-        <div class="sub">Search / Play / Browse</div>
+  <header class="topbar">
+    <div class="wrap">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="logo">D</div>
+          <div>
+            <div class="title">Dataset Demo</div>
+            <div class="subtitle">Search · Play · Inspect JSON</div>
+          </div>
+        </div>
+
+        <div class="stats" id="metaTop">—</div>
       </div>
-      <div class="rightMeta" id="metaTop"></div>
+
+      <div class="toolbar">
+        <div class="searchbox">
+          <span class="searchIcon">⌕</span>
+          <input id="q" type="search" placeholder="搜索：id / caption / asr / json ..." autocomplete="off" />
+        </div>
+
+        <select id="field" title="选择搜索字段">
+          <option value="all" selected>全字段</option>
+          <option value="id">只搜 id</option>
+          <option value="final_caption">只搜 final_caption</option>
+          <option value="asr">只搜 asr</option>
+          <option value="final_caption_asr">只搜 final_caption_asr</option>
+          <option value="json">只搜 raw JSON</option>
+        </select>
+
+        <select id="pageSize" title="每页条数">
+          <option value="10">每页 10</option>
+          <option value="20" selected>每页 20</option>
+          <option value="50">每页 50</option>
+        </select>
+
+        <label class="chip">
+          <input id="autoExpandJson" type="checkbox" />
+          <span>默认展开 JSON</span>
+        </label>
+
+        <button class="btn ghost" id="clear" type="button">清空</button>
+      </div>
+
+      <div class="meta" id="meta"></div>
     </div>
-
-    <div class="controls">
-      <input id="q" type="search" placeholder="搜索：id / caption / asr ..." autocomplete="off" />
-      <select id="field" title="选择搜索字段">
-        <option value="all" selected>全字段</option>
-        <option value="id">只搜 id</option>
-        <option value="final_caption">只搜 final_caption</option>
-        <option value="asr">只搜 asr</option>
-        <option value="final_caption_asr">只搜 final_caption_asr</option>
-      </select>
-
-      <select id="pageSize" title="每页条数">
-        <option value="10">每页 10</option>
-        <option value="20" selected>每页 20</option>
-        <option value="50">每页 50</option>
-      </select>
-
-      <button class="btn" id="clear">清空</button>
-    </div>
-
-    <div class="meta" id="meta"></div>
   </header>
 
-  <main class="wrap">
+  <main class="wrap main">
     <div id="list" class="grid"></div>
 
     <div class="pager">
-      <button class="btn" id="prev">上一页</button>
+      <button class="btn ghost" id="prev" type="button">上一页</button>
       <span id="pageInfo" class="pageInfo"></span>
-      <button class="btn" id="next">下一页</button>
+      <button class="btn ghost" id="next" type="button">下一页</button>
     </div>
 
-    <div class="hint">
-      <div><b>音频规则</b></div>
-      <div>1) 如果 JSON 里有 <code>audio_url</code>：直接播放该链接</div>
-      <div>2) 否则从 <code>audio_path</code> 取文件名，映射为 <code>./audio/&lt;filename&gt;</code>（需要把音频文件放到仓库的 <code>audio/</code> 目录）</div>
+    <div class="footnote">
+      音频规则：优先使用 <code>audio_url</code>；否则从 <code>audio_path</code> 取文件名映射到 <code>./audio/&lt;filename&gt;</code>（音频放在仓库 <code>audio/</code> 目录）。
+      <br/>
+      如果你 JSON 里文本本身写了 <code>...</code>，网页会原样显示；要显示全文请把 JSON 里的字段换成完整文本。
     </div>
   </main>
 
@@ -58,7 +75,7 @@
     <span>GitHub Pages · Vanilla JS</span>
   </footer>
 
-  <!-- 改代码后把 v=1 改成 v=2/v=3...，避免浏览器缓存旧脚本 -->
-  <script src="script.js?v=1"></script>
+  <!-- 改动代码后 v=1 改成 v=2/v=3... 以绕开缓存 -->
+  <script src="script.js?v=2"></script>
 </body>
 </html>
