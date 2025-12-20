@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EvA-Perception Dataset Explorer</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (CDN模式，控制台出现 warning 是正常的，请忽略) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,28 +15,27 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: '#6366f1', // 主题色 Indigo
-                        darkbg: '#0f172a', // 深蓝背景
-                        cardbg: '#1e293b'  // 卡片背景
+                        brand: '#6366f1', // Indigo
+                        darkbg: '#0f172a', // Slate 900
+                        cardbg: '#1e293b'  // Slate 800
                     }
                 }
             }
         }
     </script>
     <style>
-        /* 自定义滚动条样式 */
+        /* 滚动条美化 */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         
-        /* 音频播放器样式微调 */
         .audio-player { width: 100%; height: 40px; border-radius: 20px; outline: none; }
         
-        /* 确保长文本换行的关键样式 */
+        /* 核心样式：强制长文本换行，确保不被截断 */
         .full-text-display {
-            white-space: pre-wrap; /* 保留换行符，并允许自动换行 */
-            word-wrap: break-word; /* 防止长单词溢出 */
+            white-space: pre-wrap; /* 保留换行符 */
+            word-wrap: break-word; /* 长单词自动换行 */
             overflow-wrap: break-word;
         }
     </style>
@@ -44,7 +43,7 @@
 <body class="bg-darkbg text-slate-200 min-h-screen font-sans selection:bg-brand selection:text-white flex flex-col">
 
     <!-- 顶部导航 -->
-    <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-md border-b border-slate-700">
+    <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-md border-b border-slate-700 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
@@ -66,7 +65,7 @@
     <!-- 主体内容 -->
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         
-        <!-- 头部区域 -->
+        <!-- 头部标题 -->
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
                 Audio Perception Explorer
@@ -81,7 +80,7 @@
                 <div class="relative">
                     <input type="text" id="searchInput" disabled
                         class="w-full bg-cardbg border border-slate-700 text-white text-sm rounded-full focus:ring-2 focus:ring-brand focus:border-transparent block pl-12 p-4 shadow-xl transition placeholder-slate-500 disabled:opacity-50 disabled:cursor-not-allowed" 
-                        placeholder="正在加载数据... / Loading data...">
+                        placeholder="正在初始化... / Initializing...">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fa-solid fa-search text-slate-500"></i>
                     </div>
@@ -92,135 +91,133 @@
             </div>
         </div>
 
-        <!-- 加载状态 -->
+        <!-- 加载状态动画 -->
         <div id="loadingSpinner" class="text-center py-20">
             <i class="fa-solid fa-circle-notch fa-spin text-5xl text-brand mb-4"></i>
             <p class="text-slate-500 animate-pulse">正在读取 data/samples.json ...</p>
         </div>
 
-        <!-- 错误提示 -->
-        <div id="errorMsg" class="hidden text-center py-20 bg-red-900/10 border border-red-900/50 rounded-xl mx-auto max-w-2xl">
+        <!-- 错误提示框 (隐藏) -->
+        <div id="errorMsg" class="hidden text-center py-10 bg-red-900/10 border border-red-900/50 rounded-xl mx-auto max-w-2xl mt-8">
             <i class="fa-solid fa-triangle-exclamation text-4xl text-red-500 mb-4"></i>
             <h3 class="text-xl font-bold text-red-400 mb-2">数据加载失败</h3>
-            <p class="text-slate-400 text-sm px-4">
-                无法加载 JSON 文件。请确保：<br>
-                1. 文件路径为 <code>data/samples.json</code><br>
-                2. 您是通过 Web Server (如 GitHub Pages, Live Server) 访问，而不是直接双击 HTML 文件。<br>
-                <span class="text-xs opacity-70">(CORS 安全策略限制了本地文件读取)</span>
-            </p>
+            <div id="errorDetails" class="text-slate-400 text-sm px-4 text-left mx-auto max-w-lg space-y-2 font-mono bg-black/20 p-4 rounded"></div>
+            <p class="mt-4 text-slate-500 text-sm">请检查浏览器控制台 (F12 -> Console) 获取更多信息。</p>
         </div>
 
-        <!-- 数据网格 -->
+        <!-- 数据展示网格 -->
         <div id="dataGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
-            <!-- 卡片将通过 JS 动态插入 -->
+            <!-- JS 将在此处生成内容 -->
         </div>
 
-        <!-- 无搜索结果提示 -->
+        <!-- 无结果提示 -->
         <div id="noResults" class="hidden text-center py-20">
             <div class="inline-block p-4 rounded-full bg-slate-800 mb-4">
                 <i class="fa-regular fa-folder-open text-4xl text-slate-600"></i>
             </div>
-            <p class="text-slate-500">没有找到包含该关键词的样本</p>
+            <p class="text-slate-500">未找到相关结果</p>
         </div>
 
     </main>
 
     <!-- 页脚 -->
     <footer class="border-t border-slate-800 py-8 text-center text-slate-600 text-sm bg-darkbg/50">
-        <p>&copy; 2025 EvA-Perception Project. All rights reserved.</p>
+        <p>&copy; 2025 EvA-Perception Project. Generated for visualization.</p>
     </footer>
 
     <!-- 逻辑脚本 -->
     <script>
-        // 全局数据存储
+        // 全局变量
         let allData = [];
 
-        // DOM 元素引用
+        // DOM 引用
         const grid = document.getElementById('dataGrid');
         const searchInput = document.getElementById('searchInput');
         const countBadge = document.getElementById('countBadge');
         const noResults = document.getElementById('noResults');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const errorMsg = document.getElementById('errorMsg');
+        const errorDetails = document.getElementById('errorDetails');
 
         // ==========================================
-        // 工具函数
+        // 1. 核心功能函数
         // ==========================================
 
-        // 1. 路径修正：将服务器绝对路径转为相对路径
+        // 路径修正：将 /nfs/... 转换为 ./audio/...
         function getWebAudioPath(originalPath) {
             if (!originalPath) return '';
-            // 提取文件名 (例如 "Y01Kf9T7o2Zs.wav")
             const filename = originalPath.split('/').pop();
-            // 假设音频文件都在同级目录 audio/ 下
             return `audio/${filename}`;
         }
 
-        // 2. 复制文本到剪贴板
+        // 复制功能
         window.copyText = function(btn, text) {
-            // 创建临时 textarea 处理 HTML 实体解码
             const txt = document.createElement("textarea");
-            txt.innerHTML = text;
-            const decodedText = txt.value;
-            
-            navigator.clipboard.writeText(decodedText).then(() => {
+            txt.innerHTML = text; // 解码 HTML 实体
+            navigator.clipboard.writeText(txt.value).then(() => {
                 const icon = btn.querySelector('i');
                 const span = btn.querySelector('span');
-                const originalIconClass = icon.className;
+                const originalIcon = icon.className;
                 const originalText = span.textContent;
-
-                // 切换为成功状态
+                
+                // 成功反馈
                 icon.className = "fa-solid fa-check text-green-400";
                 span.className = "text-green-400 font-medium";
                 span.textContent = "Copied!";
                 
-                // 2秒后恢复
                 setTimeout(() => {
-                    icon.className = originalIconClass;
+                    icon.className = originalIcon;
                     span.className = "";
                     span.textContent = originalText;
                 }, 2000);
-            }).catch(err => {
-                console.error('Copy failed', err);
-                alert("复制失败，请手动复制");
-            });
+            }).catch(err => alert("复制失败，请手动复制"));
         }
 
         // ==========================================
-        // 核心逻辑
+        // 2. 初始化加载 (带强力错误捕获)
         // ==========================================
-
-        // 初始化：获取数据
         async function init() {
             try {
-                // 添加时间戳防止缓存
+                console.log("正在请求 data/samples.json ...");
+                
+                // 添加时间戳，防止浏览器缓存旧数据
                 const response = await fetch(`data/samples.json?t=${new Date().getTime()}`);
                 
+                // 捕获 HTTP 错误 (如 404)
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    if (response.status === 404) {
+                        throw new Error(`找不到文件 (404 Not Found)。\n请检查 GitHub 仓库中是否有 data/samples.json 且大小写完全一致。`);
+                    }
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
                 }
                 
-                allData = await response.json();
-                
-                // 隐藏 Loading，显示内容
+                // 尝试解析 JSON
+                try {
+                    allData = await response.json();
+                } catch (jsonError) {
+                    throw new Error(`JSON 格式错误: ${jsonError.message}\n请检查 json 文件末尾是否有多余逗号。`);
+                }
+
+                // 加载成功
+                console.log(`成功加载 ${allData.length} 条数据`);
                 loadingSpinner.classList.add('hidden');
                 
-                // 启用搜索框
                 searchInput.disabled = false;
                 searchInput.placeholder = "搜索 ID, Caption 或 ASR 内容...";
-                searchInput.focus();
-                
-                // 渲染所有数据
                 renderCards(allData);
 
             } catch (error) {
-                console.error('Data loading failed:', error);
+                console.error("Critical Error:", error);
                 loadingSpinner.classList.add('hidden');
                 errorMsg.classList.remove('hidden');
+                // 在页面上显示具体错误，方便截图
+                errorDetails.innerText = error.message;
             }
         }
 
-        // 渲染卡片列表
+        // ==========================================
+        // 3. 渲染逻辑
+        // ==========================================
         function renderCards(data) {
             grid.innerHTML = '';
             countBadge.textContent = `${data.length} Items`;
@@ -234,60 +231,54 @@
 
             data.forEach(item => {
                 const audioSrc = getWebAudioPath(item.audio_path);
-                // 文本安全处理 (转义引号)
+                // 安全处理特殊字符
                 const safeText = item.final_caption_asr ? item.final_caption_asr.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
                 
                 const card = document.createElement('div');
-                // h-fit 确保卡片高度随内容自动撑开
-                card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 shadow-lg hover:shadow-brand/5 flex flex-col h-fit';
+                // h-fit 确保内容不被截断，自适应高度
+                card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 shadow-lg flex flex-col h-fit';
                 
                 card.innerHTML = `
-                    <!-- 顶部音频控制区 -->
+                    <!-- 顶部音频区 -->
                     <div class="p-4 bg-slate-800/50 border-b border-slate-700/50">
                         <div class="flex justify-between items-center mb-3">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-mono font-bold text-brand bg-brand/10 px-2 py-1 rounded border border-brand/20">
-                                    ${item.id}
-                                </span>
-                            </div>
-                            <a href="${audioSrc}" download class="text-slate-500 hover:text-white transition-colors p-1" title="Download Audio">
+                            <span class="text-xs font-mono font-bold text-brand bg-brand/10 px-2 py-1 rounded border border-brand/20">
+                                ${item.id}
+                            </span>
+                            <a href="${audioSrc}" download class="text-slate-500 hover:text-white transition-colors p-1" title="Download">
                                 <i class="fa-solid fa-download"></i>
                             </a>
                         </div>
                         <audio controls class="audio-player" preload="none">
                             <source src="${audioSrc}" type="audio/wav">
-                            Your browser does not support the audio element.
                         </audio>
                     </div>
 
-                    <!-- 内容区域 -->
+                    <!-- 文本内容区 -->
                     <div class="p-5 flex-1 flex flex-col">
-                        <!-- 标题栏 -->
                         <div class="flex items-center justify-between mb-3">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fa-solid fa-align-left text-brand"></i> EvA Perception
                             </h3>
                             <button onclick="copyText(this, '${safeText}')" 
                                 class="text-xs text-slate-500 hover:text-white flex items-center gap-1.5 transition-colors group px-2 py-1 rounded hover:bg-slate-700">
-                                <i class="fa-regular fa-copy group-hover:scale-110 transition-transform"></i> 
-                                <span>Copy</span>
+                                <i class="fa-regular fa-copy group-hover:scale-110"></i> <span>Copy</span>
                             </button>
                         </div>
                         
-                        <!-- 核心文本展示 (Full Text) -->
+                        <!-- 核心展示：完整文本 -->
                         <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light mb-6">
                             ${item.final_caption_asr || '<span class="text-slate-600 italic">No content</span>'}
                         </div>
 
-                        <!-- 底部折叠详情 -->
+                        <!-- 底部详情 (ASR & Original) -->
                         <div class="mt-auto pt-4 border-t border-slate-700/50">
                             <details class="group">
                                 <summary class="flex items-center cursor-pointer text-xs font-medium text-slate-500 hover:text-brand transition-colors select-none py-1">
                                     <span class="mr-2">查看原始字段 (Debug Info)</span>
                                     <i class="fa-solid fa-chevron-down text-[10px] group-open:rotate-180 transition-transform duration-300"></i>
                                 </summary>
-                                
-                                <div class="mt-3 space-y-4 text-sm text-slate-400 pl-3 border-l-2 border-slate-700 animate-fade-in">
+                                <div class="mt-3 space-y-4 text-sm text-slate-400 pl-3 border-l-2 border-slate-700">
                                     <div>
                                         <span class="block text-xs font-mono text-slate-500 mb-1">ASR Output</span>
                                         <p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.asr}"</p>
@@ -295,9 +286,6 @@
                                     <div>
                                         <span class="block text-xs font-mono text-slate-500 mb-1">Original Final Caption</span>
                                         <p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.final_caption}"</p>
-                                    </div>
-                                    <div class="text-xs text-slate-600 font-mono break-all">
-                                        Source: ${item.audio_path}
                                     </div>
                                 </div>
                             </details>
@@ -308,18 +296,25 @@
             });
         }
 
-        // 搜索过滤逻辑
+        // 搜索监听
         searchInput.addEventListener('input', (e) => {
             const keyword = e.target.value.toLowerCase().trim();
-            
             if (!keyword) {
                 renderCards(allData);
                 return;
             }
-
             const filtered = allData.filter(item => {
                 const textMatch = (val) => val && val.toLowerCase().includes(keyword);
                 return textMatch(item.final_caption_asr) || 
                        textMatch(item.id) || 
                        textMatch(item.asr);
             });
+            renderCards(filtered);
+        });
+
+        // 启动程序
+        init();
+
+    </script>
+</body>
+</html>
