@@ -143,4 +143,136 @@ function renderCard(item){
 
         <div class="actions">
           <button class="btn ghost" data-copy="${id}" type="button">复制ID</button>
-          <button class="btn primary" data-copyjson="${id}"
+          <button class="btn primary" data-copyjson="${id}" type="button">复制JSON</button>
+          ${hasAudio ? `<a class="btn ghost" href="${audioUrl}" target="_blank" rel="noreferrer">打开音频</a>` : ""}
+          ${hasAudio ? `<a class="btn ghost" href="${audioUrl}" download>下载</a>` : ""}
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="k">audio_url（推断/直给）</div>
+        <div class="v">${hasAudio ? audioUrl : "<span style='color:var(--muted)'>（无音频：缺少 audio_path/audio_url 或文件未放入 audio/）</span>"}</div>
+
+        ${hasAudio ? `
+          <audio controls preload="none">
+            <source src="${audioUrl}">
+            你的浏览器不支持 audio 标签。
+          </audio>
+        ` : ""}
+      </div>
+
+      <div class="section">
+        <div class="k">final_caption</div>
+        <div class="v">${finalCaption || "<span style='color:var(--muted)'>（空）</span>"}</div>
+      </div>
+
+      <div class="section">
+        <div class="k">asr</div>
+        <div class="v">${asr || "<span style='color:var(--muted)'>（空）</span>"}</div>
+      </div>
+
+      <div class="section">
+        <div class="k">final_caption_asr</div>
+        <div class="v">${finalCaptionAsr || "<span style='color:var(--muted)'>（空）</span>"}</div>
+      </div>
+
+      <details ${openJson}>
+        <summary>Raw JSON（完整内容）</summary>
+        <pre class="json">${rawJson}</pre>
+      </details>
+    </article>
+  `;
+}
+
+function render(){
+  const pageSize = parseInt(elPageSize.value, 10);
+  const { items, total, pages, page: p } = paginate(filtered, page, pageSize);
+  page = p;
+
+  elMeta.textContent = `共 ${DATA.length} 条 | 当前匹配 ${total} 条`;
+  elMetaTop.textContent = `Page ${page}/${pages}`;
+
+  elList.innerHTML = items.map(renderCard).join("");
+
+  elPrev.disabled = (page <= 1);
+  elNext.disabled = (page >= pages);
+  elPageInfo.textContent = `第 ${page} / ${pages} 页`;
+
+  // 绑定复制按钮
+  elList.querySelectorAll("[data-copy]").forEach(btn => {
+    btn.addEventListener("click", () => copyToClipboard(btn.getAttribute("data-copy")));
+  });
+
+  // 绑定复制 JSON：通过 id 找到对应 item
+  elList.querySelectorAll("[data-copyjson]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-copyjson");
+      const item = DATA.find(x => x.id === id);
+      if(!item) return toast("未找到该条目");
+      copyToClipboard(stableStringify(item));
+    });
+  });
+}
+
+// ===== 交互 =====
+function applyFilter(){
+  const q = elQ.value.trim().toLowerCase();
+  const field = elField.value;
+
+  if(!q){
+    filtered = DATA.slice();
+  }else{
+    filtered = DATA.filter(it => pickText(it, field).includes(q));
+  }
+
+  page = 1;
+  render();
+}
+
+async function main(){
+  const res = await fetch(DATA_URL + `?t=${Date.now()}`, { cache: "no-store" });
+  if(!res.ok){
+    throw new Error(`HTTP ${res.status}：取不到 ${DATA_URL}（检查 data/samples.json 是否存在/大小写）`);
+  }
+
+  const txt = await res.text();
+  let arr;
+  try{
+    arr = JSON.parse(txt);
+  }catch(e){
+    throw new Error(`JSON 解析失败：${e.message}`);
+  }
+
+  if(!Array.isArray(arr)){
+    throw new Error("samples.json 顶层必须是数组（[...]）");
+  }
+
+  // 保留原始字段，并添加派生字段 _audio_url 供页面使用
+  DATA = arr.map(x => ({
+    ...x,
+    _audio_url: inferAudioUrl(x)
+  }));
+
+  filtered = DATA.slice();
+  render();
+}
+
+// 绑定事件
+elQ.addEventListener("input", applyFilter);
+elField.addEventListener("change", applyFilter);
+elPageSize.addEventListener("change", () => { page = 1; render(); });
+elPrev.addEventListener("click", () => { page -= 1; render(); });
+elNext.addEventListener("click", () => { page += 1; render(); });
+elClear.addEventListener("click", () => {
+  elQ.value = "";
+  elField.value = "all";
+  applyFilter();
+});
+elAutoExpandJson.addEventListener("change", () => render());
+
+// 启动
+main().catch(err => {
+  console.error(err);
+  elMeta.textContent = "加载失败：" + err.message;
+  elMetaTop.textContent = "Error";
+});
