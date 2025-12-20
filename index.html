@@ -1,27 +1,59 @@
 <!doctype html>
 <html lang="zh-CN">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Dataset Demo</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dataset Demo</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-    <header class="wrap">
+  <header class="wrap header">
+    <div class="titleRow">
+      <div>
         <h1>Dataset Demo</h1>
-        <div class="controls">
-            <input id="q" type="search" placeholder="搜索：id / caption / asr ..." />
-        </div>
-        <div id="meta" class="meta"></div>
-    </header>
+        <div class="sub">Search / Play / Browse</div>
+      </div>
+      <div class="rightMeta" id="metaTop"></div>
+    </div>
 
-    <main class="wrap">
-        <div id="list" class="grid"></div>
-    </main>
+    <div class="controls">
+      <input id="q" type="search" placeholder="搜索：id / caption / asr ..." autocomplete="off" />
+      <select id="field">
+        <option value="all">全字段</option>
+        <option value="id">只搜 id</option>
+        <option value="final_caption">只搜 final_caption</option>
+        <option value="asr">只搜 asr</option>
+        <option value="final_caption_asr">只搜 final_caption_asr</option>
+      </select>
+      <select id="pageSize">
+        <option value="10">每页 10</option>
+        <option value="20" selected>每页 20</option>
+        <option value="50">每页 50</option>
+      </select>
+      <button class="btn" id="clear">清空</button>
+    </div>
 
-    <script src="script.js"></script>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <main class="wrap">
+    <div id="list" class="grid"></div>
+
+    <div class="pager">
+      <button class="btn" id="prev">上一页</button>
+      <span id="pageInfo" class="pageInfo"></span>
+      <button class="btn" id="next">下一页</button>
+    </div>
+
+    <div class="hint">
+      提示：音频播放需要把文件放到 <code>docs/audio/</code>。你的 JSON 里只要有 <code>audio_path</code>（/nfs/.../Yxxx.wav）即可自动映射到本地相对路径。
+    </div>
+  </main>
+
+  <footer class="wrap footer">
+    <span>GitHub Pages · /docs</span>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
-
 </html>
