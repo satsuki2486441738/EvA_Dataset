@@ -1,87 +1,63 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dataset Viewer</title>
-  <meta name="description" content="Audio Caption Dataset Visualizer">
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvA-Perception Dataset Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#6366f1', 
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .audio-player { width: 100%; height: 40px; border-radius: 20px; }
+    </style>
 </head>
-<body>
+<body class="bg-darkbg text-slate-200 min-h-screen font-sans selection:bg-brand selection:text-white">
 
-  <div class="app-layout">
-    <!-- 侧边栏：控制面板 -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-          <span>Dataset View</span>
+    <!-- 顶部导航 -->
+    <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-md border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-wave-square text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">EvA-Perception</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="text-sm text-slate-400 hover:text-white transition">GitHub</a>
+                </div>
+            </div>
         </div>
-        <div class="badge-count" id="totalCount">Loading...</div>
-      </div>
+    </nav>
 
-      <div class="sidebar-content">
-        <div class="control-group">
-          <label>搜索内容</label>
-          <div class="input-wrapper">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="searchInput" placeholder="搜索 ID 或文本..." autocomplete="off">
-          </div>
-        </div>
+    <!-- 主体内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">
+                音频感知数据集展示
+            </h1>
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+                Visualizing <span class="text-brand font-mono">final_caption_asr</span> for audio samples.
+            </p>
 
-        <div class="control-group">
-          <label>搜索字段</label>
-          <select id="searchField">
-            <option value="all">全部 (All)</option>
-            <option value="id">ID</option>
-            <option value="final_caption_asr">Final Caption ASR</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label>每页显示</label>
-          <div class="radio-group">
-            <label><input type="radio" name="pageSize" value="10"> 10</label>
-            <label><input type="radio" name="pageSize" value="20" checked> 20</label>
-            <label><input type="radio" name="pageSize" value="50"> 50</label>
-          </div>
-        </div>
-
-        <div class="control-group" style="margin-top:auto">
-          <button id="resetBtn" class="btn btn-secondary full-width">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"></path></svg>
-            重置筛选
-          </button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- 主内容区 -->
-    <main class="main-content">
-      <header class="top-bar">
-        <div class="pagination-info" id="pageInfo">初始化中...</div>
-        <div class="pagination-controls">
-          <button id="prevBtn" class="btn-icon" disabled><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-          <button id="nextBtn" class="btn-icon" disabled><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
-        </div>
-      </header>
-
-      <div id="gridContainer" class="grid-container">
-        <!-- 卡片将在这里渲染 -->
-      </div>
-
-      <footer class="footer">
-        <p>Dataset Visualizer · Vanilla JS</p>
-      </footer>
-    </main>
-  </div>
-
-  <!-- Toast 通知组件 -->
-  <div id="toast" class="toast hidden">已复制到剪贴板</div>
-
-  <script src="script.js?v=4"></script>
-</body>
-</html>
+            <div class="relative max-w-xl mx-auto">
+                <input type="text" id="searchInput" disabled
+                    class="w-full bg-cardbg border border-slate-700 text-white text-sm round
