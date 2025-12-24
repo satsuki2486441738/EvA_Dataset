@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvA Comparison Explorer</title>
+    <title>EvA Perception | Multi-Dataset Comparison</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -18,173 +18,169 @@
                         c_auto: '#f43f5e',   // Auto-ACD (Rose)
                         darkbg: '#0f172a', 
                         cardbg: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     }
                 }
             }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .audio-player { width: 100%; height: 40px; border-radius: 20px; outline: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        /* 紧凑显示的必须样式 */
-        .full-text-display {
-            white-space: pre-wrap; 
-            word-wrap: break-word; 
-            overflow-wrap: break-word;
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
+        .eva-card-glow {
+            position: relative;
+        }
+        .eva-card-glow::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(90deg, #6366f1, transparent, transparent);
+            border-radius: 1.5rem;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .audio-custom::-webkit-media-controls-panel {
+            background-color: #1e293b;
+        }
+        .audio-custom::-webkit-media-controls-current-time-display,
+        .audio-custom::-webkit-media-controls-time-remaining-display {
+            color: #ffffff;
         }
     </style>
 </head>
 <body class="bg-darkbg text-slate-200 min-h-screen font-sans selection:bg-brand selection:text-white flex flex-col">
 
-    <nav class="sticky top-0 z-50 bg-darkbg/90 backdrop-blur-md border-b border-slate-700 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shadow-lg shadow-brand/20">
-                        <i class="fa-solid fa-layer-group text-white"></i>
-                    </div>
-                    <span class="text-xl font-bold tracking-tight text-white">EvA Comparison</span>
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-darkbg/80 backdrop-blur-lg border-b border-slate-800 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-tr from-brand to-indigo-400 rounded-xl flex items-center justify-center shadow-lg shadow-brand/20">
+                    <i class="fa-solid fa-wand-magic-sparkles text-white text-xl"></i>
                 </div>
-                <div class="flex items-center gap-4">
-                    <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white transition-colors">
-                        <i class="fa-brands fa-github text-xl"></i>
-                    </a>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tighter text-white block leading-none">EvA</span>
+                    <span class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Perception Explorer</span>
                 </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex gap-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <span class="text-brand">Comparison Mode</span>
+                    <span class="opacity-30">|</span>
+                    <span>2025 v1.0</span>
+                </div>
+                <a href="#" class="text-slate-400 hover:text-white transition-colors text-xl">
+                    <i class="fa-brands fa-github"></i>
+                </a>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
-                Multi-Model Comparison
+    <main class="flex-grow max-w-7xl mx-auto px-6 py-12 w-full">
+        <!-- Header Section -->
+        <div class="text-center mb-16">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tighter">
+                Perception <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand to-indigo-400">Benchmarking</span>
             </h1>
-            <p class="text-lg text-slate-400 max-w-3xl mx-auto mb-8">
-                Benchmarking <span class="text-brand font-mono font-bold">EvA-Perception</span> against 
-                <span class="text-c_audio font-bold">AudioSetCaps</span>, 
-                <span class="text-c_wav font-bold">WavCaps</span>, and 
-                <span class="text-c_auto font-bold">Auto-ACD</span>.
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Comparing <span class="text-white font-semibold underline decoration-brand decoration-2 underline-offset-4">EvA-Perception</span> with state-of-the-art baselines. 
+                Focusing on temporal details and ASR-integrated audio understanding.
             </p>
             
-            <div class="relative max-w-xl mx-auto group">
-                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand via-c_wav to-c_auto rounded-full opacity-30 group-hover:opacity-60 transition duration-500 blur"></div>
+            <!-- Search Bar -->
+            <div class="relative max-w-2xl mx-auto group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-brand/20 to-indigo-500/20 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
                 <div class="relative">
                     <input type="text" id="searchInput"
-                        class="w-full bg-cardbg border border-slate-700 text-white text-sm rounded-full focus:ring-2 focus:ring-brand focus:border-transparent block pl-12 p-4 shadow-xl transition placeholder-slate-500" 
-                        placeholder="搜索 ID 或任意 Caption 内容...">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-search text-slate-500"></i>
+                        class="w-full bg-slate-900 border border-slate-700/50 text-white rounded-2xl focus:ring-2 focus:ring-brand focus:border-transparent block pl-14 p-5 shadow-2xl transition-all placeholder-slate-600" 
+                        placeholder="Search by ID or keywords (e.g. 'music', 'engine')...">
+                    <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass text-slate-500 group-focus-within:text-brand transition-colors"></i>
                     </div>
                     <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                        <span id="countBadge" class="bg-slate-700/50 border border-slate-600 text-xs px-2 py-1 rounded-md text-slate-300">0 Items</span>
+                        <span id="countBadge" class="bg-slate-800 border border-slate-700 text-[10px] px-3 py-1 rounded-full text-slate-400 font-mono">0 SAMPLES</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="dataGrid" class="grid grid-cols-1 gap-8 pb-10 max-w-4xl mx-auto"></div>
+        <!-- Data Grid -->
+        <div id="dataGrid" class="space-y-12">
+            <!-- Cards will be injected here -->
+        </div>
 
-        <div id="noResults" class="hidden text-center py-20">
-            <div class="inline-block p-4 rounded-full bg-slate-800 mb-4">
-                <i class="fa-regular fa-folder-open text-4xl text-slate-600"></i>
+        <!-- Empty State -->
+        <div id="noResults" class="hidden text-center py-32">
+            <div class="inline-block p-6 rounded-3xl bg-slate-900 border border-slate-800 mb-6">
+                <i class="fa-solid fa-magnifying-glass-chart text-5xl text-slate-700"></i>
             </div>
-            <p class="text-slate-500">未找到相关结果</p>
+            <h3 class="text-xl text-white font-bold">No results found</h3>
+            <p class="text-slate-500">Try searching for a different ID or audio content.</p>
         </div>
     </main>
 
-    <footer class="border-t border-slate-800 py-8 text-center text-slate-600 text-sm bg-darkbg/50">
-        <p>&copy; 2025 EvA-Perception Project.</p>
+    <footer class="border-t border-slate-900 py-12 text-center bg-slate-950/50">
+        <p class="text-slate-500 text-sm">&copy; 2025 EvA-Perception Project. High-fidelity Audio Understanding.</p>
     </footer>
 
     <script>
         // ==========================================
-        // 1. 数据整合 (Merged Data)
+        // 1. Data (Cleaned & Focused)
         // ==========================================
         const rawData = [
             {
                 "id": "01Kf9T7o2Zs",
-                "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/Y01Kf9T7o2Zs.wav",
-                "asr": "Music.",
-                "final_caption": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout...",
-                
-                // 1. EvA (Main)
-                "final_caption_asr": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out.",
-                
-                // 2. AudioSetCaps
-                "baseline_caption": "This audio clip features a distinct, rich bell sound, creating an evocative and resonant sonic experience.",
-                
-                // 3. WavCaps
-                "wavcaps_caption": "Music plays with the sound of ticking and crickets.",
-                
-                // 4. Auto-ACD
-                "autoacd_caption": "Soft ambient music plays as a clock ticks, creating a serene atmosphere in an indoor setting."
+                "audio": "audio/Y01Kf9T7o2Zs.wav",
+                "eva": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out.",
+                "audioset": "This audio clip features a distinct, rich bell sound, creating an evocative and resonant sonic experience.",
+                "wavcaps": "Music plays with the sound of ticking and crickets.",
+                "autoacd": "Soft ambient music plays as a clock ticks, creating a serene atmosphere in an indoor setting."
             },
             {
                 "id": "NtWI0hZVg-k",
-                "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/YNtWI0hZVg-k.wav",
-                "asr": "Based on my experience, she didn't have to be too patient. But, John, former newlyweds.",
-                "final_caption": "A low, persistent mechanical whirring sound dominates the entire duration...",
-
-                // 1. EvA (Main)
-                "final_caption_asr": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking in likely English amidst the ongoing background whir, saying, “Based on my experience, she didn't have to be too patient. But, John, former newlyweds.” His mid-range vocals are occasionally punctuated by rhythmic impacts and a soft tap near the end. Conversational exchanges continue throughout the latter half, with overlapping speech patterns suggesting multiple participants, while the steady mechanical sound persists until the audio concludes.",
-                
-                // 2. AudioSetCaps
-                "baseline_caption": "A person can be heard engaging in a phone conversation, with distinct beeping sounds indicative of dialing a number using a touch-tone phone. The interaction involves verbal communication between the parties on the call.",
-
-                // 3. WavCaps
-                "wavcaps_caption": "Human voices, laughter, and conversation are heard with male speech and tapping.",
-
-                // 4. Auto-ACD
-                "autoacd_caption": "A man's voice speaks as a phone rings and dialing tones are heard in the background, possibly in a busy office."
+                "audio": "audio/YNtWI0hZVg-k.wav",
+                "eva": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking in likely English amidst the ongoing background whir, saying, “Based on my experience, she didn't have to be too patient. But, John, former newlyweds.”",
+                "audioset": "A person can be heard engaging in a phone conversation, with distinct beeping sounds indicative of dialing a number using a touch-tone phone.",
+                "wavcaps": "Human voices, laughter, and conversation are heard with male speech and tapping.",
+                "autoacd": "A man's voice speaks as a phone rings and dialing tones are heard in the background, possibly in a busy office."
             },
             {
                 "id": "dLnH58IDcVs",
-                "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/YdLnH58IDcVs.wav",
-                "final_caption": "A faint but steady mechanical hum establishes the background ambiance throughout. Intermittent male speech occurs in overlapping intervals against this persistent hum. A sharp metallic clink punctuates the audio at an early point, followed shortly by the abrupt eruption of loud crackling sizzle that rapidly becomes dominant. This sustained sizzle maintains intensity while the male speech continues in layered fashion beneath it. The mechanical hum remains present but subdued in the lower frequencies. The audio sequence concludes with a distinct clatter of dishes or pans being placed down, occurring concurrently with the ongoing sizzle which gradually fades toward the end.",
-                "asr": "किया हुआ अदरक यहां पर थोड़ी अदरक का काफी इस्तेमाल करते हैं",
-                "final_caption_asr": "A faint but steady mechanical hum establishes the background ambiance throughout. Intermittent male speech in Hindi occurs in overlapping intervals against this persistent hum, including phrases such as “किया हुआ अदरक यहां पर” and “थोड़ी अदरक का काफी इस्तेमाल करते हैं.” A sharp metallic clink punctuates the audio at an early point, followed shortly by the abrupt eruption of loud crackling sizzle that rapidly becomes dominant. This sustained sizzle maintains intensity while the male speech continues in layered fashion beneath it. The mechanical hum remains present but subdued in the lower frequencies. The audio sequence concludes with a distinct clatter of dishes or pans being placed down, occurring concurrently with the ongoing sizzle which gradually fades toward the end.",
-                "baseline_caption": "A man engages in culinary preparation, the sounds of sizzling food and clanking pan filling the air.",
-                "wavcaps_caption": "The sound of food sizzling in a pan can be heard as a man is frying it on the stove.",
-                "autoacd_caption": "A man speaks with sizzling and clanging dishes."
+                "audio": "audio/YdLnH58IDcVs.wav",
+                "eva": "A faint but steady mechanical hum establishes the background ambiance throughout. Intermittent male speech in Hindi occurs in overlapping intervals against this persistent hum, including phrases such as “किया हुआ अदरक यहां पर” and “थोड़ी अदरक का काफी इस्तेमाल करते हैं.” The audio sequence concludes with a distinct clatter of dishes or pans being placed down, occurring concurrently with the ongoing sizzle which gradually fades toward the end.",
+                "audioset": "A man engages in culinary preparation, the sounds of sizzling food and clanking pan filling the air.",
+                "wavcaps": "The sound of food sizzling in a pan can be heard as a man is frying it on the stove.",
+                "autoacd": "A man speaks with sizzling and clanging dishes."
             }
         ];
 
         // ==========================================
-        // 2. 逻辑部分
+        // 2. Logic
         // ==========================================
         const grid = document.getElementById('dataGrid');
         const searchInput = document.getElementById('searchInput');
         const countBadge = document.getElementById('countBadge');
         const noResults = document.getElementById('noResults');
 
-        function getWebAudioPath(originalPath) {
-            if (!originalPath) return '';
-            const filename = originalPath.split('/').pop();
-            return `audio/${filename}`;
-        }
-
+        // Copy Function
         window.copyText = function(btn, text) {
-            const txt = document.createElement("textarea");
-            txt.innerHTML = text;
-            navigator.clipboard.writeText(txt.value).then(() => {
+            navigator.clipboard.writeText(text).then(() => {
                 const icon = btn.querySelector('i');
-                const originalIcon = icon.className;
                 icon.className = "fa-solid fa-check text-green-400";
-                if(btn.tagName === 'BUTTON') btn.classList.add('text-green-400');
-                setTimeout(() => {
-                    icon.className = originalIcon;
-                    if(btn.tagName === 'BUTTON') btn.classList.remove('text-green-400');
-                }, 2000);
+                setTimeout(() => { icon.className = "fa-regular fa-copy"; }, 2000);
             });
         }
 
         function renderCards(data) {
             grid.innerHTML = '';
-            countBadge.textContent = `${data.length} Items`;
+            countBadge.textContent = `${data.length} SAMPLES`;
 
             if (data.length === 0) {
                 noResults.classList.remove('hidden');
@@ -194,112 +190,99 @@
             }
 
             data.forEach(item => {
-                const audioSrc = getWebAudioPath(item.audio_path);
-                
-                // 文本处理助手：去空格 + HTML转义
-                const formatText = (text) => text ? text.trim().replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
-                
-                // 准备安全文本用于复制
-                const safeEva = formatText(item.final_caption_asr);
-                const safeAudio = formatText(item.baseline_caption);
-                const safeWav = formatText(item.wavcaps_caption);
-                const safeAuto = formatText(item.autoacd_caption);
-                
-                // 准备显示文本
-                const dEva = item.final_caption_asr ? item.final_caption_asr.trim() : '<span class="text-slate-600 italic">No content</span>';
-                const dAudio = item.baseline_caption ? item.baseline_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
-                const dWav = item.wavcaps_caption ? item.wavcaps_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
-                const dAuto = item.autoacd_caption ? item.autoacd_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
-                const dAsr = item.asr ? item.asr.trim() : '';
-                const dGt = item.final_caption ? item.final_caption.trim() : '';
-
                 const card = document.createElement('div');
-                // 改为 col-span-1 (这里我把 grid 改成了 1列，因为4个对比内容太长了，单列显示效果更好)
-                card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden shadow-lg flex flex-col h-fit hover:border-slate-500/80 transition-all';
+                card.className = 'eva-card-glow bg-cardbg rounded-[2rem] border border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 hover:border-slate-700';
                 
-                // 注意：下面的HTML全部使用紧凑写法防止缩进
                 card.innerHTML = `
-                    <div class="p-4 bg-slate-800/50 border-b border-slate-700/50 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
-                            <span class="text-sm font-mono font-bold text-slate-300 bg-slate-700/50 px-3 py-1 rounded border border-slate-600">${item.id}</span>
-                            <a href="${audioSrc}" download class="text-slate-500 hover:text-white transition-colors p-2"><i class="fa-solid fa-download"></i></a>
+                    <!-- Top Bar -->
+                    <div class="px-8 py-5 bg-slate-900/50 border-b border-slate-800 flex flex-wrap items-center justify-between gap-6">
+                        <div class="flex items-center gap-4">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Sample ID</span>
+                                <span class="text-white font-mono font-bold tracking-tight">${item.id}</span>
+                            </div>
                         </div>
-                        <audio controls class="audio-player w-full sm:max-w-md" preload="none"><source src="${audioSrc}" type="audio/wav"></audio>
+                        <div class="flex-grow max-w-xl">
+                            <audio controls class="audio-custom w-full h-10 rounded-full">
+                                <source src="${item.audio}" type="audio/wav">
+                            </audio>
+                        </div>
+                        <a href="${item.audio}" download class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-brand hover:text-white transition-all">
+                            <i class="fa-solid fa-download text-sm"></i>
+                        </a>
                     </div>
 
-                    <div class="p-6 flex-1 flex flex-col space-y-6">
-                        
-                        <!-- 1. EvA Perception (Star/Main) -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-sm font-bold text-brand uppercase tracking-widest flex items-center gap-2">
-                                    <i class="fa-solid fa-star"></i> EvA Perception
-                                </h3>
-                                <button onclick="copyText(this, '${safeEva}')" class="text-xs text-slate-500 hover:text-brand transition-colors"><i class="fa-regular fa-copy"></i></button>
-                            </div>
-                            <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light pl-3 border-l-4 border-brand bg-brand/5 p-3 rounded-r">${dEva}</div>
-                        </div>
-
-                        <!-- Divider with Label -->
-                        <div class="relative flex items-center py-2">
-                            <div class="flex-grow border-t border-slate-700"></div>
-                            <span class="flex-shrink-0 mx-4 text-xs text-slate-500 uppercase font-bold tracking-wider">Comparisons</span>
-                            <div class="flex-grow border-t border-slate-700"></div>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-5">
-                            <!-- 2. AudioSetCaps -->
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <h3 class="text-xs font-bold text-c_audio uppercase tracking-widest flex items-center gap-2">
-                                        <i class="fa-solid fa-database"></i> AudioSetCaps
-                                    </h3>
-                                    <button onclick="copyText(this, '${safeAudio}')" class="text-xs text-slate-500 hover:text-c_audio transition-colors"><i class="fa-regular fa-copy"></i></button>
-                                </div>
-                                <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-c_audio bg-slate-800/30 p-2 rounded-r">${dAudio}</div>
-                            </div>
-
-                            <!-- 3. WavCaps -->
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <h3 class="text-xs font-bold text-c_wav uppercase tracking-widest flex items-center gap-2">
-                                        <i class="fa-solid fa-wave-square"></i> WavCaps
-                                    </h3>
-                                    <button onclick="copyText(this, '${safeWav}')" class="text-xs text-slate-500 hover:text-c_wav transition-colors"><i class="fa-regular fa-copy"></i></button>
-                                </div>
-                                <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-c_wav bg-slate-800/30 p-2 rounded-r">${dWav}</div>
-                            </div>
-
-                            <!-- 4. Auto-ACD -->
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <h3 class="text-xs font-bold text-c_auto uppercase tracking-widest flex items-center gap-2">
-                                        <i class="fa-solid fa-robot"></i> Auto-ACD
-                                    </h3>
-                                    <button onclick="copyText(this, '${safeAuto}')" class="text-xs text-slate-500 hover:text-c_auto transition-colors"><i class="fa-regular fa-copy"></i></button>
-                                </div>
-                                <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-c_auto bg-slate-800/30 p-2 rounded-r">${dAuto}</div>
-                            </div>
-                        </div>
-
-                        <!-- Debug Info -->
-                        <div class="mt-4 pt-4 border-t border-slate-700/50">
-                            <details class="group">
-                                <summary class="flex items-center cursor-pointer text-xs font-medium text-slate-500 hover:text-brand transition-colors select-none py-1">
-                                    <span class="mr-2">Debug Info (ASR & GT)</span>
-                                    <i class="fa-solid fa-chevron-down text-[10px] group-open:rotate-180 transition-transform duration-300"></i>
-                                </summary>
-                                <div class="mt-3 space-y-4 text-sm text-slate-400 pl-3 border-l-2 border-slate-700">
-                                    <div>
-                                        <span class="block text-xs font-mono text-slate-500 mb-1">ASR Output</span>
-                                        <p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${dAsr}"</p>
+                    <!-- Comparison Content -->
+                    <div class="p-8 md:p-10">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                            
+                            <!-- Left: EvA (Ours) -->
+                            <div class="lg:col-span-7 space-y-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center">
+                                            <i class="fa-solid fa-wand-magic-sparkles text-brand text-sm"></i>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-white tracking-tight uppercase">EvA Perception <span class="text-slate-600 ml-2 font-normal text-sm lowercase tracking-normal italic">(ours)</span></h3>
                                     </div>
-                                    <div>
-                                        <span class="block text-xs font-mono text-slate-500 mb-1">Original Final Caption</span>
-                                        <p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${dGt}"</p>
+                                    <button onclick="copyText(this, \`${item.eva}\`)" class="text-slate-600 hover:text-brand transition-colors p-2">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="relative group">
+                                    <div class="absolute -inset-1 bg-gradient-to-r from-brand/20 to-transparent rounded-2xl blur opacity-20"></div>
+                                    <div class="relative bg-slate-900/80 p-8 rounded-3xl border border-brand/20 text-xl text-slate-100 leading-[1.6] font-light shadow-inner">
+                                        ${item.eva}
                                     </div>
                                 </div>
-                            </details>
+                                <div class="flex gap-2">
+                                    <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-3 py-1 rounded-full uppercase">Temporal-Aware</span>
+                                    <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-3 py-1 rounded-full uppercase">ASR-Integrated</span>
+                                </div>
+                            </div>
+
+                            <!-- Right: Baselines -->
+                            <div class="lg:col-span-5 space-y-8">
+                                <div class="flex items-center gap-4">
+                                    <div class="h-px flex-grow bg-slate-800"></div>
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Baselines</span>
+                                    <div class="h-px flex-grow bg-slate-800"></div>
+                                </div>
+
+                                <!-- AudioSetCaps -->
+                                <div class="group">
+                                    <div class="flex justify-between items-center mb-2 px-1">
+                                        <span class="text-xs font-bold text-c_audio tracking-widest uppercase">AudioSetCaps</span>
+                                        <span class="text-[10px] text-slate-600 font-mono italic">General Descriptions</span>
+                                    </div>
+                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_audio/30 transition-colors">
+                                        "${item.audioset}"
+                                    </div>
+                                </div>
+
+                                <!-- WavCaps -->
+                                <div class="group">
+                                    <div class="flex justify-between items-center mb-2 px-1">
+                                        <span class="text-xs font-bold text-c_wav tracking-widest uppercase">WavCaps</span>
+                                        <span class="text-[10px] text-slate-600 font-mono italic">Summarized / Short</span>
+                                    </div>
+                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_wav/30 transition-colors">
+                                        "${item.wavcaps}"
+                                    </div>
+                                </div>
+
+                                <!-- Auto-ACD -->
+                                <div class="group">
+                                    <div class="flex justify-between items-center mb-2 px-1">
+                                        <span class="text-xs font-bold text-c_auto tracking-widest uppercase">Auto-ACD</span>
+                                        <span class="text-[10px] text-slate-600 font-mono italic">Low Complexity</span>
+                                    </div>
+                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_auto/30 transition-colors">
+                                        "${item.autoacd}"
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 `;
@@ -307,21 +290,18 @@
             });
         }
 
+        // Search Filter Logic
         searchInput.addEventListener('input', (e) => {
-            const keyword = e.target.value.toLowerCase().trim();
-            if (!keyword) { renderCards(rawData); return; }
-            const filtered = rawData.filter(item => {
-                const textMatch = (val) => val && val.toLowerCase().includes(keyword);
-                return textMatch(item.final_caption_asr) || 
-                       textMatch(item.baseline_caption) ||
-                       textMatch(item.wavcaps_caption) ||
-                       textMatch(item.autoacd_caption) ||
-                       textMatch(item.id) || 
-                       textMatch(item.asr);
-            });
+            const kw = e.target.value.toLowerCase().trim();
+            const filtered = rawData.filter(i => 
+                i.id.toLowerCase().includes(kw) || 
+                i.eva.toLowerCase().includes(kw) || 
+                i.audioset.toLowerCase().includes(kw)
+            );
             renderCards(filtered);
         });
 
+        // Initial Render
         renderCards(rawData);
     </script>
 </body>
