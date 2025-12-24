@@ -12,7 +12,8 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: '#6366f1', 
+                        brand: '#6366f1',  // EvA 主题色 (Indigo)
+                        other: '#10b981',  // 对比模型主题色 (Emerald)
                         darkbg: '#0f172a', 
                         cardbg: '#1e293b'
                     }
@@ -56,13 +57,13 @@
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
-                Audio Perception Explorer
+                Model Comparison
             </h1>
             <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
-                Visualizing <span class="text-brand font-mono font-semibold">final_caption_asr</span> generation results.
+                Comparing <span class="text-brand font-mono font-bold">EvA-Perception</span> vs <span class="text-other font-mono font-bold">Baseline</span> generation results.
             </p>
             <div class="relative max-w-xl mx-auto group">
-                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand to-purple-600 rounded-full opacity-30 group-hover:opacity-60 transition duration-500 blur"></div>
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand to-other rounded-full opacity-30 group-hover:opacity-60 transition duration-500 blur"></div>
                 <div class="relative">
                     <input type="text" id="searchInput"
                         class="w-full bg-cardbg border border-slate-700 text-white text-sm rounded-full focus:ring-2 focus:ring-brand focus:border-transparent block pl-12 p-4 shadow-xl transition placeholder-slate-500" 
@@ -93,22 +94,26 @@
 
     <script>
         // ==========================================
-        // 1. 数据直接嵌入这里 (无需 fetch，不再报错)
+        // 1. 数据部分 (已更新，加入 baseline_caption)
         // ==========================================
         const rawData = [
             {
                 "id": "01Kf9T7o2Zs",
                 "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/Y01Kf9T7o2Zs.wav",
-                "final_caption": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out.",
+                "final_caption": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout...",
                 "asr": "Music.",
-                "final_caption_asr": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out."
+                "final_caption_asr": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out.",
+                // 新增字段
+                "baseline_caption": "This audio clip features a distinct, rich bell sound, creating an evocative and resonant sonic experience."
             },
             {
                 "id": "NtWI0hZVg-k",
                 "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/YNtWI0hZVg-k.wav",
-                "final_caption": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking amidst the ongoing background whir, his mid-range vocals occasionally punctuated by rhythmic impacts and a soft tap near the end. Conversational exchanges continue throughout the latter half, with overlapping speech patterns suggesting multiple participants, while the steady mechanical sound persists until the audio concludes.",
+                "final_caption": "A low, persistent mechanical whirring sound dominates the entire duration...",
                 "asr": "Based on my experience, she didn't have to be too patient. But, John, former newlyweds.",
-                "final_caption_asr": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking in likely English amidst the ongoing background whir, saying, “Based on my experience, she didn't have to be too patient. But, John, former newlyweds.” His mid-range vocals are occasionally punctuated by rhythmic impacts and a soft tap near the end. Conversational exchanges continue throughout the latter half, with overlapping speech patterns suggesting multiple participants, while the steady mechanical sound persists until the audio concludes."
+                "final_caption_asr": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking in likely English amidst the ongoing background whir, saying, “Based on my experience, she didn't have to be too patient. But, John, former newlyweds.” His mid-range vocals are occasionally punctuated by rhythmic impacts and a soft tap near the end. Conversational exchanges continue throughout the latter half, with overlapping speech patterns suggesting multiple participants, while the steady mechanical sound persists until the audio concludes.",
+                // 新增字段
+                "baseline_caption": "A person can be heard engaging in a phone conversation, with distinct beeping sounds indicative of dialing a number using a touch-tone phone. The interaction involves verbal communication between the parties on the call."
             }
         ];
 
@@ -158,7 +163,10 @@
 
             data.forEach(item => {
                 const audioSrc = getWebAudioPath(item.audio_path);
-                const safeText = item.final_caption_asr ? item.final_caption_asr.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
+                
+                // 处理文本安全
+                const evaText = item.final_caption_asr ? item.final_caption_asr.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
+                const baselineText = item.baseline_caption ? item.baseline_caption.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
                 
                 const card = document.createElement('div');
                 card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 shadow-lg flex flex-col h-fit';
@@ -171,15 +179,49 @@
                         </div>
                         <audio controls class="audio-player" preload="none"><source src="${audioSrc}" type="audio/wav"></audio>
                     </div>
+
                     <div class="p-5 flex-1 flex flex-col">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-align-left text-brand"></i> EvA Perception</h3>
-                            <button onclick="copyText(this, '${safeText}')" class="text-xs text-slate-500 hover:text-white flex items-center gap-1.5 transition-colors group px-2 py-1 rounded hover:bg-slate-700"><i class="fa-regular fa-copy group-hover:scale-110"></i> <span>Copy</span></button>
+                        
+                        <!-- 1. EvA Perception 部分 (主模型) -->
+                        <div class="mb-5">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xs font-bold text-brand uppercase tracking-widest flex items-center gap-2">
+                                    <i class="fa-solid fa-star"></i> EvA Perception
+                                </h3>
+                                <button onclick="copyText(this, '${evaText}')" class="text-xs text-slate-500 hover:text-brand transition-colors flex items-center gap-1 group">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light pl-3 border-l-2 border-brand/50">
+                                ${item.final_caption_asr || '<span class="text-slate-600 italic">No content</span>'}
+                            </div>
                         </div>
-                        <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light mb-6">${item.final_caption_asr || '<span class="text-slate-600 italic">No content</span>'}</div>
+
+                        <!-- 分割线 -->
+                        <div class="border-t border-dashed border-slate-700 my-4"></div>
+
+                        <!-- 2. Baseline/Comparison 部分 (对比模型) -->
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xs font-bold text-other uppercase tracking-widest flex items-center gap-2">
+                                    <i class="fa-solid fa-robot"></i> Baseline Model
+                                </h3>
+                                <button onclick="copyText(this, '${baselineText}')" class="text-xs text-slate-500 hover:text-other transition-colors flex items-center gap-1 group">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-other/50 bg-slate-800/20 p-2 rounded-r">
+                                ${item.baseline_caption || '<span class="text-slate-600 italic">No content</span>'}
+                            </div>
+                        </div>
+
+                        <!-- 3. Debug 详情 -->
                         <div class="mt-auto pt-4 border-t border-slate-700/50">
                             <details class="group">
-                                <summary class="flex items-center cursor-pointer text-xs font-medium text-slate-500 hover:text-brand transition-colors select-none py-1"><span class="mr-2">查看原始字段 (Debug Info)</span><i class="fa-solid fa-chevron-down text-[10px] group-open:rotate-180 transition-transform duration-300"></i></summary>
+                                <summary class="flex items-center cursor-pointer text-xs font-medium text-slate-500 hover:text-brand transition-colors select-none py-1">
+                                    <span class="mr-2">Debug Info (ASR & GT)</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] group-open:rotate-180 transition-transform duration-300"></i>
+                                </summary>
                                 <div class="mt-3 space-y-4 text-sm text-slate-400 pl-3 border-l-2 border-slate-700">
                                     <div><span class="block text-xs font-mono text-slate-500 mb-1">ASR Output</span><p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.asr}"</p></div>
                                     <div><span class="block text-xs font-mono text-slate-500 mb-1">Original Final Caption</span><p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.final_caption}"</p></div>
@@ -197,12 +239,14 @@
             if (!keyword) { renderCards(rawData); return; }
             const filtered = rawData.filter(item => {
                 const textMatch = (val) => val && val.toLowerCase().includes(keyword);
-                return textMatch(item.final_caption_asr) || textMatch(item.id) || textMatch(item.asr);
+                return textMatch(item.final_caption_asr) || 
+                       textMatch(item.baseline_caption) || // 允许搜索 baseline
+                       textMatch(item.id) || 
+                       textMatch(item.asr);
             });
             renderCards(filtered);
         });
 
-        // 直接初始化渲染，不再请求网络
         renderCards(rawData);
     </script>
 </body>
