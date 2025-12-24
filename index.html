@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvA Perception | Multi-Dataset Comparison</title>
+    <title>EvA | Evidence-First Audio Dataset</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -50,7 +50,6 @@
         .audio-custom::-webkit-media-controls-current-time-display,
         .audio-custom::-webkit-media-controls-time-remaining-display { color: #ffffff; }
 
-        /* Hugging Face Emoji Style */
         .hf-logo { width: 1.25rem; height: 1.25rem; vertical-align: middle; margin-right: 0.5rem; }
     </style>
 </head>
@@ -61,47 +60,45 @@
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-tr from-brand to-indigo-400 rounded-xl flex items-center justify-center shadow-lg shadow-brand/20">
-                    <i class="fa-solid fa-wand-magic-sparkles text-white text-xl"></i>
+                    <i class="fa-solid fa-layer-group text-white text-xl"></i>
                 </div>
                 <div>
                     <span class="text-xl font-extrabold tracking-tighter text-white block leading-none">EvA</span>
-                    <span class="text-[10px] text-slate-500 font-mono uppercase tracking-widest leading-none">Perception Explorer</span>
+                    <span class="text-[10px] text-slate-500 font-mono uppercase tracking-widest leading-none">Evidence-First Audio</span>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <!-- GitHub -->
                 <a href="https://github.com/satsuki2486441738/EvA" target="_blank" 
                    class="hidden md:flex items-center px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-white transition-all">
                     <i class="fa-brands fa-github mr-2"></i> GitHub
                 </a>
-                <!-- Hugging Face -->
                 <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" target="_blank" 
                    class="flex items-center px-4 py-2 rounded-full bg-hf hover:bg-[#eab308] text-black text-sm font-bold transition-all shadow-lg shadow-hf/20">
-                    <span class="hf-logo">🤗</span> Hugging Face
+                    <span class="hf-logo">🤗</span> HF Dataset
                 </a>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow max-w-7xl mx-auto px-6 py-12 w-full">
+    <main class="flex-grow max-w-7xl mx-auto px-6 py-16 w-full">
         <!-- Header Section -->
-        <div class="text-center mb-16">
+        <div class="text-center mb-20">
             <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tighter">
-                Perception <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand to-indigo-400">Benchmarking</span>
+                Evidence-First <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand to-indigo-400 leading-tight">Audio Dataset</span>
             </h1>
-            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-                Comparing <span class="text-white font-semibold underline decoration-brand decoration-2 underline-offset-4">EvA-Perception</span> with state-of-the-art baselines. 
-                Focusing on temporal details and ASR-integrated audio understanding.
+            <p class="text-lg text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+                <span class="text-white font-semibold">EvA-Perception</span> redefines audio understanding by grounding descriptions in <span class="text-brand italic font-medium">verifiable evidence</span>. 
+                Experience richer temporal context and ASR-integrated captions that outperform standard baselines.
             </p>
 
             <!-- Quick Action Buttons -->
-            <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <div class="flex flex-wrap justify-center gap-4 mb-14">
                 <a href="https://github.com/satsuki2486441738/EvA" target="_blank" class="flex items-center px-6 py-3 rounded-xl bg-indigo-600/10 border border-indigo-500/30 text-brand font-bold hover:bg-indigo-600/20 transition-all">
-                    <i class="fa-solid fa-code mr-2"></i> Project Code
+                    <i class="fa-solid fa-code mr-2"></i> Code Repository
                 </a>
                 <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" target="_blank" class="flex items-center px-6 py-3 rounded-xl bg-hf/10 border border-hf/30 text-hf font-bold hover:bg-hf/20 transition-all">
-                    <i class="fa-solid fa-database mr-2"></i> Dataset (v2)
+                    <i class="fa-solid fa-database mr-2"></i> Access Dataset v2
                 </a>
             </div>
             
@@ -110,20 +107,20 @@
                 <div class="absolute -inset-1 bg-gradient-to-r from-brand/20 to-indigo-500/20 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
                 <div class="relative">
                     <input type="text" id="searchInput"
-                        class="w-full bg-slate-900 border border-slate-700/50 text-white rounded-2xl focus:ring-2 focus:ring-brand focus:border-transparent block pl-14 p-5 shadow-2xl transition-all placeholder-slate-600 text-base" 
-                        placeholder="Search by ID or keywords (e.g. 'music', 'Hindi')...">
+                        class="w-full bg-slate-900 border border-slate-700/50 text-white rounded-2xl focus:ring-2 focus:ring-brand focus:border-transparent block pl-14 p-5 shadow-2xl transition-all placeholder-slate-600 text-base font-medium" 
+                        placeholder="Search by ID or keywords (e.g. 'mechanical', 'voice')...">
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                         <i class="fa-solid fa-magnifying-glass text-slate-500 group-focus-within:text-brand transition-colors"></i>
                     </div>
                     <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                        <span id="countBadge" class="bg-slate-800 border border-slate-700 text-[10px] px-3 py-1 rounded-full text-slate-400 font-mono">0 SAMPLES</span>
+                        <span id="countBadge" class="bg-slate-800 border border-slate-700 text-[10px] px-3 py-1 rounded-full text-slate-400 font-mono font-bold">0 SAMPLES</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Data Grid -->
-        <div id="dataGrid" class="space-y-12 max-w-6xl mx-auto">
+        <div id="dataGrid" class="space-y-16 max-w-6xl mx-auto">
             <!-- Cards injected by JS -->
         </div>
 
@@ -131,7 +128,7 @@
         <div id="noResults" class="hidden text-center py-32">
             <i class="fa-solid fa-magnifying-glass-chart text-5xl text-slate-700 mb-6"></i>
             <h3 class="text-xl text-white font-bold">No results found</h3>
-            <p class="text-slate-500">Try searching for a different ID or audio content.</p>
+            <p class="text-slate-500 font-medium">No samples match your current search criteria.</p>
         </div>
     </main>
 
@@ -139,10 +136,10 @@
     <footer class="border-t border-slate-900 bg-slate-950/50 py-16">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <div class="flex justify-center gap-8 mb-8 text-slate-500">
-                <a href="https://github.com/satsuki2486441738/EvA" class="hover:text-brand"><i class="fa-brands fa-github text-2xl"></i></a>
-                <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" class="hover:text-hf"><span class="text-2xl">🤗</span></a>
+                <a href="https://github.com/satsuki2486441738/EvA" class="hover:text-brand transition-colors"><i class="fa-brands fa-github text-2xl"></i></a>
+                <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" class="hover:text-hf transition-colors"><span class="text-2xl">🤗</span></a>
             </div>
-            <p class="text-slate-500 text-sm font-medium">© 2025 EvA-Perception Project. Licensed under Apache 2.0.</p>
+            <p class="text-slate-500 text-sm font-semibold tracking-wide">© 2025 EvA-Perception Project. EVIDENCE-FIRST AUDIO UNDERSTANDING.</p>
         </div>
     </footer>
 
@@ -197,45 +194,55 @@
                 const card = document.createElement('div');
                 card.className = 'eva-card-glow bg-cardbg rounded-[2rem] border border-slate-800 shadow-2xl overflow-hidden transition-all duration-500';
                 card.innerHTML = `
-                    <div class="px-8 py-5 bg-slate-900/50 border-b border-slate-800 flex flex-wrap items-center justify-between gap-6">
+                    <div class="px-8 py-6 bg-slate-900/50 border-b border-slate-800 flex flex-wrap items-center justify-between gap-6">
                         <div class="flex items-center gap-4">
-                            <span class="text-white font-mono font-bold px-3 py-1 bg-slate-800 rounded-lg text-sm border border-slate-700">${item.id}</span>
+                            <span class="text-white font-mono font-bold px-4 py-1.5 bg-slate-800 rounded-xl text-xs border border-slate-700 shadow-inner">ID: ${item.id}</span>
                         </div>
                         <div class="flex-grow max-w-xl">
                             <audio controls class="audio-custom w-full h-10 rounded-full shadow-inner"><source src="${item.audio}" type="audio/wav"></audio>
                         </div>
-                        <a href="${item.audio}" download class="text-slate-500 hover:text-brand transition-colors"><i class="fa-solid fa-cloud-arrow-down text-xl"></i></a>
+                        <a href="${item.audio}" download class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 text-slate-500 hover:text-white hover:bg-brand transition-all shadow-lg"><i class="fa-solid fa-download text-sm"></i></a>
                     </div>
-                    <div class="p-8 md:p-10 lg:p-12">
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                            <div class="lg:col-span-7 space-y-6">
+                    <div class="p-8 md:p-12">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                            <div class="lg:col-span-7 space-y-8">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles text-brand text-sm"></i></div>
-                                        <h3 class="text-lg font-bold text-white tracking-tight uppercase">EvA Perception</h3>
+                                        <div class="w-10 h-10 rounded-xl bg-brand/20 flex items-center justify-center shadow-lg shadow-brand/10"><i class="fa-solid fa-shield-halved text-brand text-base"></i></div>
+                                        <div>
+                                            <h3 class="text-xl font-extrabold text-white tracking-tight uppercase leading-none">EvA Perception</h3>
+                                            <span class="text-[10px] text-brand/80 font-bold tracking-widest uppercase">Evidence-First Description</span>
+                                        </div>
                                     </div>
-                                    <button onclick="copyText(this, \`${item.eva}\`)" class="text-slate-600 hover:text-brand transition-colors"><i class="fa-regular fa-copy text-lg"></i></button>
+                                    <button onclick="copyText(this, \`${item.eva}\`)" class="w-10 h-10 rounded-lg text-slate-600 hover:text-brand hover:bg-brand/10 transition-all"><i class="fa-regular fa-copy text-lg"></i></button>
                                 </div>
                                 <div class="relative group">
-                                    <div class="absolute -inset-1 bg-gradient-to-r from-brand/20 to-transparent rounded-2xl blur opacity-20"></div>
-                                    <div class="relative bg-slate-900/80 p-8 rounded-3xl border border-brand/30 text-xl text-slate-100 leading-relaxed font-light shadow-2xl tracking-tight">
+                                    <div class="absolute -inset-2 bg-gradient-to-r from-brand/20 to-indigo-500/10 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-700"></div>
+                                    <div class="relative bg-slate-900/90 p-10 rounded-[2rem] border border-brand/20 text-xl text-slate-100 leading-relaxed font-light shadow-2xl tracking-tight">
                                         ${item.eva}
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <span class="text-[10px] font-bold bg-indigo-500/10 text-brand px-3 py-1 rounded-full border border-indigo-500/20 uppercase">Detailed Events</span>
-                                    <span class="text-[10px] font-bold bg-indigo-500/10 text-brand px-3 py-1 rounded-full border border-indigo-500/20 uppercase">ASR Transcripts</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-[10px] font-black bg-indigo-500/10 text-brand px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-tighter">Temporal Details</span>
+                                    <span class="text-[10px] font-black bg-indigo-500/10 text-brand px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-tighter">ASR Evidence</span>
+                                    <span class="text-[10px] font-black bg-emerald-500/10 text-emerald-500 px-4 py-1.5 rounded-full border border-emerald-500/20 uppercase tracking-tighter">Verified</span>
                                 </div>
                             </div>
-                            <div class="lg:col-span-5 space-y-6">
-                                <div class="flex items-center gap-4 mb-2"><div class="h-px flex-grow bg-slate-800"></div><span class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Baselines</span><div class="h-px flex-grow bg-slate-800"></div></div>
-                                <div class="space-y-4">
-                                    <div class="group"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-c_audio uppercase tracking-widest">AudioSetCaps</span></div>
-                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_audio/30 transition-colors">"${item.audioset}"</div></div>
-                                    <div class="group"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-c_wav uppercase tracking-widest">WavCaps</span></div>
-                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_wav/30 transition-colors">"${item.wavcaps}"</div></div>
-                                    <div class="group"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-c_auto uppercase tracking-widest">Auto-ACD</span></div>
-                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_auto/30 transition-colors">"${item.autoacd}"</div></div>
+                            <div class="lg:col-span-5 space-y-8">
+                                <div class="flex items-center gap-4 mb-2">
+                                    <div class="h-px flex-grow bg-slate-800"></div>
+                                    <span class="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">Baseline Models</span>
+                                    <div class="h-px flex-grow bg-slate-800"></div>
+                                </div>
+                                <div class="space-y-6">
+                                    <div class="group"><div class="flex justify-between items-center mb-2 px-1"><span class="text-[11px] font-black text-c_audio uppercase tracking-widest">AudioSetCaps</span><span class="text-[9px] text-slate-700 font-bold uppercase italic tracking-tighter">Limited Depth</span></div>
+                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_audio/30 transition-all">"${item.audioset}"</div></div>
+                                    
+                                    <div class="group"><div class="flex justify-between items-center mb-2 px-1"><span class="text-[11px] font-black text-c_wav uppercase tracking-widest">WavCaps</span><span class="text-[9px] text-slate-700 font-bold uppercase italic tracking-tighter">Brief Summary</span></div>
+                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_wav/30 transition-all">"${item.wavcaps}"</div></div>
+                                    
+                                    <div class="group"><div class="flex justify-between items-center mb-2 px-1"><span class="text-[11px] font-black text-c_auto uppercase tracking-widest">Auto-ACD</span><span class="text-[9px] text-slate-700 font-bold uppercase italic tracking-tighter">Partial Context</span></div>
+                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_auto/30 transition-all">"${item.autoacd}"</div></div>
                                 </div>
                             </div>
                         </div>
@@ -247,7 +254,11 @@
 
         searchInput.addEventListener('input', (e) => {
             const kw = e.target.value.toLowerCase().trim();
-            const filtered = rawData.filter(i => i.id.toLowerCase().includes(kw) || i.eva.toLowerCase().includes(kw));
+            const filtered = rawData.filter(i => 
+                i.id.toLowerCase().includes(kw) || 
+                i.eva.toLowerCase().includes(kw) ||
+                i.audioset.toLowerCase().includes(kw)
+            );
             renderCards(filtered);
         });
 
