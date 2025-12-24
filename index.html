@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AudioSetCaps Explorer</title>
+    <title>EvA Comparison Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -12,8 +12,10 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: '#6366f1',  // EvA (Indigo)
-                        other: '#10b981',  // AudioSetCaps (Emerald)
+                        brand: '#6366f1',    // EvA (Indigo)
+                        c_audio: '#10b981',  // AudioSetCaps (Emerald)
+                        c_wav: '#f59e0b',    // WavCaps (Amber)
+                        c_auto: '#f43f5e',   // Auto-ACD (Rose)
                         darkbg: '#0f172a', 
                         cardbg: '#1e293b'
                     }
@@ -28,6 +30,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         .audio-player { width: 100%; height: 40px; border-radius: 20px; outline: none; }
         
+        /* 紧凑显示的必须样式 */
         .full-text-display {
             white-space: pre-wrap; 
             word-wrap: break-word; 
@@ -42,9 +45,9 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shadow-lg shadow-brand/20">
-                        <i class="fa-solid fa-headphones text-white"></i>
+                        <i class="fa-solid fa-layer-group text-white"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-white">AudioSetCaps Explorer</span>
+                    <span class="text-xl font-bold tracking-tight text-white">EvA Comparison</span>
                 </div>
                 <div class="flex items-center gap-4">
                     <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white transition-colors">
@@ -58,19 +61,21 @@
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
-                AudioSetCaps Comparison
+                Multi-Model Comparison
             </h1>
             <p class="text-lg text-slate-400 max-w-3xl mx-auto mb-8">
-                Visualizing captioning results.<br>
-                Comparing <span class="text-brand font-mono font-bold">EvA-Perception</span> vs <span class="text-other font-mono font-bold">AudioSetCaps</span>.
+                Benchmarking <span class="text-brand font-mono font-bold">EvA-Perception</span> against 
+                <span class="text-c_audio font-bold">AudioSetCaps</span>, 
+                <span class="text-c_wav font-bold">WavCaps</span>, and 
+                <span class="text-c_auto font-bold">Auto-ACD</span>.
             </p>
             
             <div class="relative max-w-xl mx-auto group">
-                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand to-other rounded-full opacity-30 group-hover:opacity-60 transition duration-500 blur"></div>
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand via-c_wav to-c_auto rounded-full opacity-30 group-hover:opacity-60 transition duration-500 blur"></div>
                 <div class="relative">
                     <input type="text" id="searchInput"
                         class="w-full bg-cardbg border border-slate-700 text-white text-sm rounded-full focus:ring-2 focus:ring-brand focus:border-transparent block pl-12 p-4 shadow-xl transition placeholder-slate-500" 
-                        placeholder="搜索 ID, Caption 或 ASR 内容...">
+                        placeholder="搜索 ID 或任意 Caption 内容...">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="fa-solid fa-search text-slate-500"></i>
                     </div>
@@ -81,7 +86,7 @@
             </div>
         </div>
 
-        <div id="dataGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10"></div>
+        <div id="dataGrid" class="grid grid-cols-1 gap-8 pb-10 max-w-4xl mx-auto"></div>
 
         <div id="noResults" class="hidden text-center py-20">
             <div class="inline-block p-4 rounded-full bg-slate-800 mb-4">
@@ -96,25 +101,51 @@
     </footer>
 
     <script>
+        // ==========================================
+        // 1. 数据整合 (Merged Data)
+        // ==========================================
         const rawData = [
             {
                 "id": "01Kf9T7o2Zs",
                 "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/Y01Kf9T7o2Zs.wav",
-                "final_caption": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout...",
                 "asr": "Music.",
+                "final_caption": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout...",
+                
+                // 1. EvA (Main)
                 "final_caption_asr": "A low, sustained musical drone establishes an atmospheric and suspenseful ambiance throughout, featuring a hypnotic synth pad with shimmering hi-hat accents and background noise in the latter half. Near the conclusion, a sharp mechanical tick briefly interrupts the music, immediately followed by high-pitched rhythmic cricket chirping that continues into the final moments before fading out.",
-                "baseline_caption": "This audio clip features a distinct, rich bell sound, creating an evocative and resonant sonic experience."
+                
+                // 2. AudioSetCaps
+                "baseline_caption": "This audio clip features a distinct, rich bell sound, creating an evocative and resonant sonic experience.",
+                
+                // 3. WavCaps
+                "wavcaps_caption": "Music plays with the sound of ticking and crickets.",
+                
+                // 4. Auto-ACD
+                "autoacd_caption": "Soft ambient music plays as a clock ticks, creating a serene atmosphere in an indoor setting."
             },
             {
                 "id": "NtWI0hZVg-k",
                 "audio_path": "/nfs/ofs-audio-llm/xinyuan/data/Audioset-SL/audio/YNtWI0hZVg-k.wav",
-                "final_caption": "A low, persistent mechanical whirring sound dominates the entire duration...",
                 "asr": "Based on my experience, she didn't have to be too patient. But, John, former newlyweds.",
+                "final_caption": "A low, persistent mechanical whirring sound dominates the entire duration...",
+
+                // 1. EvA (Main)
                 "final_caption_asr": "A low, persistent mechanical whirring sound dominates the entire duration. Initially, a brief indistinct vocal sound transitions into light laughter. An electronic tone with a faintly musical quality emerges over the mechanical hum, lasting a few seconds before fading. Several clattering impacts follow, including a sharp, sudden collision at around three seconds. A male voice begins speaking in likely English amidst the ongoing background whir, saying, “Based on my experience, she didn't have to be too patient. But, John, former newlyweds.” His mid-range vocals are occasionally punctuated by rhythmic impacts and a soft tap near the end. Conversational exchanges continue throughout the latter half, with overlapping speech patterns suggesting multiple participants, while the steady mechanical sound persists until the audio concludes.",
-                "baseline_caption": "A person can be heard engaging in a phone conversation, with distinct beeping sounds indicative of dialing a number using a touch-tone phone. The interaction involves verbal communication between the parties on the call."
+                
+                // 2. AudioSetCaps
+                "baseline_caption": "A person can be heard engaging in a phone conversation, with distinct beeping sounds indicative of dialing a number using a touch-tone phone. The interaction involves verbal communication between the parties on the call.",
+
+                // 3. WavCaps
+                "wavcaps_caption": "Human voices, laughter, and conversation are heard with male speech and tapping.",
+
+                // 4. Auto-ACD
+                "autoacd_caption": "A man's voice speaks as a phone rings and dialing tones are heard in the background, possibly in a busy office."
             }
         ];
 
+        // ==========================================
+        // 2. 逻辑部分
+        // ==========================================
         const grid = document.getElementById('dataGrid');
         const searchInput = document.getElementById('searchInput');
         const countBadge = document.getElementById('countBadge');
@@ -155,61 +186,94 @@
             data.forEach(item => {
                 const audioSrc = getWebAudioPath(item.audio_path);
                 
+                // 文本处理助手：去空格 + HTML转义
                 const formatText = (text) => text ? text.trim().replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
-                const evaTextSafe = formatText(item.final_caption_asr);
-                const baseTextSafe = formatText(item.baseline_caption);
                 
-                const evaDisplay = item.final_caption_asr ? item.final_caption_asr.trim() : '<span class="text-slate-600 italic">No content</span>';
-                const baseDisplay = item.baseline_caption ? item.baseline_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
-                const asrDisplay = item.asr ? item.asr.trim() : '';
-                const gtDisplay = item.final_caption ? item.final_caption.trim() : '';
+                // 准备安全文本用于复制
+                const safeEva = formatText(item.final_caption_asr);
+                const safeAudio = formatText(item.baseline_caption);
+                const safeWav = formatText(item.wavcaps_caption);
+                const safeAuto = formatText(item.autoacd_caption);
+                
+                // 准备显示文本
+                const dEva = item.final_caption_asr ? item.final_caption_asr.trim() : '<span class="text-slate-600 italic">No content</span>';
+                const dAudio = item.baseline_caption ? item.baseline_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
+                const dWav = item.wavcaps_caption ? item.wavcaps_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
+                const dAuto = item.autoacd_caption ? item.autoacd_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
+                const dAsr = item.asr ? item.asr.trim() : '';
+                const dGt = item.final_caption ? item.final_caption.trim() : '';
 
                 const card = document.createElement('div');
-                card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 shadow-lg flex flex-col h-fit';
+                // 改为 col-span-1 (这里我把 grid 改成了 1列，因为4个对比内容太长了，单列显示效果更好)
+                card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden shadow-lg flex flex-col h-fit hover:border-slate-500/80 transition-all';
                 
-                // 【核心修改点】
-                // 1. 将 "Baseline Model" 修改为了 "AudioSetCaps"
-                // 2. 保持了紧凑写法以解决缩进问题
+                // 注意：下面的HTML全部使用紧凑写法防止缩进
                 card.innerHTML = `
-                    <div class="p-4 bg-slate-800/50 border-b border-slate-700/50">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-xs font-mono font-bold text-brand bg-brand/10 px-2 py-1 rounded border border-brand/20">${item.id}</span>
-                            <a href="${audioSrc}" download class="text-slate-500 hover:text-white transition-colors p-1" title="Download Audio"><i class="fa-solid fa-download"></i></a>
+                    <div class="p-4 bg-slate-800/50 border-b border-slate-700/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <span class="text-sm font-mono font-bold text-slate-300 bg-slate-700/50 px-3 py-1 rounded border border-slate-600">${item.id}</span>
+                            <a href="${audioSrc}" download class="text-slate-500 hover:text-white transition-colors p-2"><i class="fa-solid fa-download"></i></a>
                         </div>
-                        <audio controls class="audio-player" preload="none"><source src="${audioSrc}" type="audio/wav"></audio>
+                        <audio controls class="audio-player w-full sm:max-w-md" preload="none"><source src="${audioSrc}" type="audio/wav"></audio>
                     </div>
 
-                    <div class="p-5 flex-1 flex flex-col">
-                        <!-- EvA Perception -->
-                        <div class="mb-5">
+                    <div class="p-6 flex-1 flex flex-col space-y-6">
+                        
+                        <!-- 1. EvA Perception (Star/Main) -->
+                        <div>
                             <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-xs font-bold text-brand uppercase tracking-widest flex items-center gap-2">
+                                <h3 class="text-sm font-bold text-brand uppercase tracking-widest flex items-center gap-2">
                                     <i class="fa-solid fa-star"></i> EvA Perception
                                 </h3>
-                                <button onclick="copyText(this, '${evaTextSafe}')" class="text-xs text-slate-500 hover:text-brand transition-colors flex items-center gap-1 group">
-                                    <i class="fa-regular fa-copy"></i>
-                                </button>
+                                <button onclick="copyText(this, '${safeEva}')" class="text-xs text-slate-500 hover:text-brand transition-colors"><i class="fa-regular fa-copy"></i></button>
                             </div>
-                            <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light pl-3 border-l-2 border-brand/50">${evaDisplay}</div>
+                            <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light pl-3 border-l-4 border-brand bg-brand/5 p-3 rounded-r">${dEva}</div>
                         </div>
 
-                        <div class="border-t border-dashed border-slate-700 my-4"></div>
+                        <!-- Divider with Label -->
+                        <div class="relative flex items-center py-2">
+                            <div class="flex-grow border-t border-slate-700"></div>
+                            <span class="flex-shrink-0 mx-4 text-xs text-slate-500 uppercase font-bold tracking-wider">Comparisons</span>
+                            <div class="flex-grow border-t border-slate-700"></div>
+                        </div>
 
-                        <!-- AudioSetCaps (Comparison) -->
-                        <div class="mb-6">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="text-xs font-bold text-other uppercase tracking-widest flex items-center gap-2">
-                                    <i class="fa-solid fa-database"></i> AudioSetCaps
-                                </h3>
-                                <button onclick="copyText(this, '${baseTextSafe}')" class="text-xs text-slate-500 hover:text-other transition-colors flex items-center gap-1 group">
-                                    <i class="fa-regular fa-copy"></i>
-                                </button>
+                        <div class="grid grid-cols-1 gap-5">
+                            <!-- 2. AudioSetCaps -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <h3 class="text-xs font-bold text-c_audio uppercase tracking-widest flex items-center gap-2">
+                                        <i class="fa-solid fa-database"></i> AudioSetCaps
+                                    </h3>
+                                    <button onclick="copyText(this, '${safeAudio}')" class="text-xs text-slate-500 hover:text-c_audio transition-colors"><i class="fa-regular fa-copy"></i></button>
+                                </div>
+                                <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-c_audio bg-slate-800/30 p-2 rounded-r">${dAudio}</div>
                             </div>
-                            <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-other/50 bg-slate-800/20 p-2 rounded-r">${baseDisplay}</div>
+
+                            <!-- 3. WavCaps -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <h3 class="text-xs font-bold text-c_wav uppercase tracking-widest flex items-center gap-2">
+                                        <i class="fa-solid fa-wave-square"></i> WavCaps
+                                    </h3>
+                                    <button onclick="copyText(this, '${safeWav}')" class="text-xs text-slate-500 hover:text-c_wav transition-colors"><i class="fa-regular fa-copy"></i></button>
+                                </div>
+                                <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-c_wav bg-slate-800/30 p-2 rounded-r">${dWav}</div>
+                            </div>
+
+                            <!-- 4. Auto-ACD -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <h3 class="text-xs font-bold text-c_auto uppercase tracking-widest flex items-center gap-2">
+                                        <i class="fa-solid fa-robot"></i> Auto-ACD
+                                    </h3>
+                                    <button onclick="copyText(this, '${safeAuto}')" class="text-xs text-slate-500 hover:text-c_auto transition-colors"><i class="fa-regular fa-copy"></i></button>
+                                </div>
+                                <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-c_auto bg-slate-800/30 p-2 rounded-r">${dAuto}</div>
+                            </div>
                         </div>
 
                         <!-- Debug Info -->
-                        <div class="mt-auto pt-4 border-t border-slate-700/50">
+                        <div class="mt-4 pt-4 border-t border-slate-700/50">
                             <details class="group">
                                 <summary class="flex items-center cursor-pointer text-xs font-medium text-slate-500 hover:text-brand transition-colors select-none py-1">
                                     <span class="mr-2">Debug Info (ASR & GT)</span>
@@ -218,11 +282,11 @@
                                 <div class="mt-3 space-y-4 text-sm text-slate-400 pl-3 border-l-2 border-slate-700">
                                     <div>
                                         <span class="block text-xs font-mono text-slate-500 mb-1">ASR Output</span>
-                                        <p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${asrDisplay}"</p>
+                                        <p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${dAsr}"</p>
                                     </div>
                                     <div>
                                         <span class="block text-xs font-mono text-slate-500 mb-1">Original Final Caption</span>
-                                        <p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${gtDisplay}"</p>
+                                        <p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${dGt}"</p>
                                     </div>
                                 </div>
                             </details>
@@ -240,6 +304,8 @@
                 const textMatch = (val) => val && val.toLowerCase().includes(keyword);
                 return textMatch(item.final_caption_asr) || 
                        textMatch(item.baseline_caption) ||
+                       textMatch(item.wavcaps_caption) ||
+                       textMatch(item.autoacd_caption) ||
                        textMatch(item.id) || 
                        textMatch(item.asr);
             });
