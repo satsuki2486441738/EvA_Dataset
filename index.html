@@ -13,7 +13,7 @@
                 extend: {
                     colors: {
                         brand: '#6366f1',  // EvA (Indigo)
-                        other: '#10b981',  // Baseline (Emerald)
+                        other: '#10b981',  // AudioSetCaps (Emerald)
                         darkbg: '#0f172a', 
                         cardbg: '#1e293b'
                     }
@@ -28,7 +28,6 @@
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         .audio-player { width: 100%; height: 40px; border-radius: 20px; outline: none; }
         
-        /* 关键样式：保留文本内部换行，但通过HTML结构紧凑化去除首行缩进 */
         .full-text-display {
             white-space: pre-wrap; 
             word-wrap: break-word; 
@@ -45,7 +44,7 @@
                     <div class="w-8 h-8 bg-brand rounded-lg flex items-center justify-center shadow-lg shadow-brand/20">
                         <i class="fa-solid fa-headphones text-white"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-white">AudioSetCaps</span>
+                    <span class="text-xl font-bold tracking-tight text-white">AudioSetCaps Explorer</span>
                 </div>
                 <div class="flex items-center gap-4">
                     <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white transition-colors">
@@ -59,11 +58,11 @@
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
-                AudioSetCaps
+                AudioSetCaps Comparison
             </h1>
             <p class="text-lg text-slate-400 max-w-3xl mx-auto mb-8">
-                Visualizing captioning results on the AudioSetCaps dataset.<br>
-                Comparing <span class="text-brand font-mono font-bold">EvA-Perception</span> vs <span class="text-other font-mono font-bold">Baseline</span>.
+                Visualizing captioning results.<br>
+                Comparing <span class="text-brand font-mono font-bold">EvA-Perception</span> vs <span class="text-other font-mono font-bold">AudioSetCaps</span>.
             </p>
             
             <div class="relative max-w-xl mx-auto group">
@@ -93,7 +92,7 @@
     </main>
 
     <footer class="border-t border-slate-800 py-8 text-center text-slate-600 text-sm bg-darkbg/50">
-        <p>&copy; 2025 AudioSetCaps Project. Generated for visualization.</p>
+        <p>&copy; 2025 EvA-Perception Project.</p>
     </footer>
 
     <script>
@@ -160,7 +159,6 @@
                 const evaTextSafe = formatText(item.final_caption_asr);
                 const baseTextSafe = formatText(item.baseline_caption);
                 
-                // 去除所有空格，确保变量非常纯净
                 const evaDisplay = item.final_caption_asr ? item.final_caption_asr.trim() : '<span class="text-slate-600 italic">No content</span>';
                 const baseDisplay = item.baseline_caption ? item.baseline_caption.trim() : '<span class="text-slate-600 italic">No content</span>';
                 const asrDisplay = item.asr ? item.asr.trim() : '';
@@ -169,7 +167,9 @@
                 const card = document.createElement('div');
                 card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 shadow-lg flex flex-col h-fit';
                 
-                // 【核心修改】注意看下面 class="full-text-display..." 后面紧跟的是 ${变量}，中间没有换行！
+                // 【核心修改点】
+                // 1. 将 "Baseline Model" 修改为了 "AudioSetCaps"
+                // 2. 保持了紧凑写法以解决缩进问题
                 card.innerHTML = `
                     <div class="p-4 bg-slate-800/50 border-b border-slate-700/50">
                         <div class="flex justify-between items-center mb-3">
@@ -195,11 +195,11 @@
 
                         <div class="border-t border-dashed border-slate-700 my-4"></div>
 
-                        <!-- Baseline Model -->
+                        <!-- AudioSetCaps (Comparison) -->
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-2">
                                 <h3 class="text-xs font-bold text-other uppercase tracking-widest flex items-center gap-2">
-                                    <i class="fa-solid fa-robot"></i> Baseline Model
+                                    <i class="fa-solid fa-database"></i> AudioSetCaps
                                 </h3>
                                 <button onclick="copyText(this, '${baseTextSafe}')" class="text-xs text-slate-500 hover:text-other transition-colors flex items-center gap-1 group">
                                     <i class="fa-regular fa-copy"></i>
