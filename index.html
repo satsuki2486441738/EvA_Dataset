@@ -164,9 +164,15 @@
             data.forEach(item => {
                 const audioSrc = getWebAudioPath(item.audio_path);
                 
-                // 处理文本安全
-                const evaText = item.final_caption_asr ? item.final_caption_asr.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
-                const baselineText = item.baseline_caption ? item.baseline_caption.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
+                // 核心修改点：加入了 .trim() 方法
+                // 它会自动删除字符串最前面和最后面的所有空格/换行符
+                const evaText = item.final_caption_asr 
+                    ? item.final_caption_asr.trim().replace(/'/g, "&apos;").replace(/"/g, "&quot;") 
+                    : "";
+                    
+                const baselineText = item.baseline_caption 
+                    ? item.baseline_caption.trim().replace(/'/g, "&apos;").replace(/"/g, "&quot;") 
+                    : "";
                 
                 const card = document.createElement('div');
                 card.className = 'bg-cardbg border border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-500/80 transition-all duration-300 shadow-lg flex flex-col h-fit';
@@ -182,7 +188,7 @@
 
                     <div class="p-5 flex-1 flex flex-col">
                         
-                        <!-- 1. EvA Perception 部分 (主模型) -->
+                        <!-- 1. EvA Perception -->
                         <div class="mb-5">
                             <div class="flex items-center justify-between mb-2">
                                 <h3 class="text-xs font-bold text-brand uppercase tracking-widest flex items-center gap-2">
@@ -193,24 +199,25 @@
                                 </button>
                             </div>
                             <div class="full-text-display text-lg text-slate-100 leading-relaxed font-light pl-3 border-l-2 border-brand/50">
-                                ${item.final_caption_asr || '<span class="text-slate-600 italic">No content</span>'}
+                                ${item.final_caption_asr ? item.final_caption_asr.trim() : '<span class="text-slate-600 italic">No content</span>'}
                             </div>
                         </div>
 
                         <!-- 分割线 -->
                         <div class="border-t border-dashed border-slate-700 my-4"></div>
 
-                        <!-- 2. Baseline/Comparison 部分 (对比模型) -->
+                        <!-- 2. Baseline Model -->
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-2">
                                 <h3 class="text-xs font-bold text-other uppercase tracking-widest flex items-center gap-2">
-                                    <i class="fa-solid fa-robot"></i> AudioSetCaps                                </h3>
+                                    <i class="fa-solid fa-robot"></i> Baseline Model
+                                </h3>
                                 <button onclick="copyText(this, '${baselineText}')" class="text-xs text-slate-500 hover:text-other transition-colors flex items-center gap-1 group">
                                     <i class="fa-regular fa-copy"></i>
                                 </button>
                             </div>
                             <div class="full-text-display text-base text-slate-300 leading-relaxed font-light pl-3 border-l-2 border-other/50 bg-slate-800/20 p-2 rounded-r">
-                                ${item.baseline_caption || '<span class="text-slate-600 italic">No content</span>'}
+                                ${item.baseline_caption ? item.baseline_caption.trim() : '<span class="text-slate-600 italic">No content</span>'}
                             </div>
                         </div>
 
@@ -222,8 +229,8 @@
                                     <i class="fa-solid fa-chevron-down text-[10px] group-open:rotate-180 transition-transform duration-300"></i>
                                 </summary>
                                 <div class="mt-3 space-y-4 text-sm text-slate-400 pl-3 border-l-2 border-slate-700">
-                                    <div><span class="block text-xs font-mono text-slate-500 mb-1">ASR Output</span><p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.asr}"</p></div>
-                                    <div><span class="block text-xs font-mono text-slate-500 mb-1">Original Final Caption</span><p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.final_caption}"</p></div>
+                                    <div><span class="block text-xs font-mono text-slate-500 mb-1">ASR Output</span><p class="italic text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.asr ? item.asr.trim() : ''}"</p></div>
+                                    <div><span class="block text-xs font-mono text-slate-500 mb-1">Original Final Caption</span><p class="text-slate-300 full-text-display bg-slate-800/50 p-2 rounded border border-slate-700/50">"${item.final_caption ? item.final_caption.trim() : ''}"</p></div>
                                 </div>
                             </details>
                         </div>
