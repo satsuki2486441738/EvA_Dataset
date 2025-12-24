@@ -60,7 +60,7 @@
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-tr from-brand to-indigo-400 rounded-xl flex items-center justify-center shadow-lg shadow-brand/20">
-                    <i class="fa-solid fa-layer-group text-white text-xl"></i>
+                    <i class="fa-solid fa-wave-square text-white text-lg"></i>
                 </div>
                 <div>
                     <span class="text-xl font-extrabold tracking-tighter text-white block leading-none">EvA</span>
@@ -139,7 +139,7 @@
                 <a href="https://github.com/satsuki2486441738/EvA" class="hover:text-brand transition-colors"><i class="fa-brands fa-github text-2xl"></i></a>
                 <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" class="hover:text-hf transition-colors"><span class="text-2xl">🤗</span></a>
             </div>
-            <p class="text-slate-500 text-sm font-semibold tracking-wide">© 2025 EvA-Perception Project. EVIDENCE-FIRST AUDIO UNDERSTANDING.</p>
+            <p class="text-slate-500 text-sm font-semibold tracking-wide uppercase">© 2025 EvA-Perception Project. Evidence-First Audio Understanding.</p>
         </div>
     </footer>
 
@@ -201,17 +201,19 @@
                         <div class="flex-grow max-w-xl">
                             <audio controls class="audio-custom w-full h-10 rounded-full shadow-inner"><source src="${item.audio}" type="audio/wav"></audio>
                         </div>
-                        <a href="${item.audio}" download class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 text-slate-500 hover:text-white hover:bg-brand transition-all shadow-lg"><i class="fa-solid fa-download text-sm"></i></a>
+                        <a href="${item.audio}" download class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800 text-slate-500 hover:text-white hover:bg-brand transition-all shadow-lg shadow-black/20"><i class="fa-solid fa-download text-sm"></i></a>
                     </div>
                     <div class="p-8 md:p-12">
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                             <div class="lg:col-span-7 space-y-8">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-brand/20 flex items-center justify-center shadow-lg shadow-brand/10"><i class="fa-solid fa-shield-halved text-brand text-base"></i></div>
+                                        <div class="w-10 h-10 rounded-xl bg-brand/20 flex items-center justify-center shadow-lg shadow-brand/10">
+                                            <i class="fa-solid fa-wave-square text-brand text-base"></i>
+                                        </div>
                                         <div>
                                             <h3 class="text-xl font-extrabold text-white tracking-tight uppercase leading-none">EvA Perception</h3>
-                                            <span class="text-[10px] text-brand/80 font-bold tracking-widest uppercase">Evidence-First Description</span>
+                                            <span class="text-[10px] text-brand/80 font-bold tracking-widest uppercase mt-1 inline-block">Evidence-First Description</span>
                                         </div>
                                     </div>
                                     <button onclick="copyText(this, \`${item.eva}\`)" class="w-10 h-10 rounded-lg text-slate-600 hover:text-brand hover:bg-brand/10 transition-all"><i class="fa-regular fa-copy text-lg"></i></button>
@@ -222,10 +224,10 @@
                                         ${item.eva}
                                     </div>
                                 </div>
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="text-[10px] font-black bg-indigo-500/10 text-brand px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-tighter">Temporal Details</span>
-                                    <span class="text-[10px] font-black bg-indigo-500/10 text-brand px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-tighter">ASR Evidence</span>
-                                    <span class="text-[10px] font-black bg-emerald-500/10 text-emerald-500 px-4 py-1.5 rounded-full border border-emerald-500/20 uppercase tracking-tighter">Verified</span>
+                                <div class="flex flex-wrap gap-2 pt-2">
+                                    <span class="text-[10px] font-black bg-indigo-500/10 text-brand px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-tighter shadow-sm">Temporal Details</span>
+                                    <span class="text-[10px] font-black bg-indigo-500/10 text-brand px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-tighter shadow-sm">ASR Evidence</span>
+                                    <span class="text-[10px] font-black bg-indigo-500/10 text-brand px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-tighter shadow-sm">Fine-grained</span>
                                 </div>
                             </div>
                             <div class="lg:col-span-5 space-y-8">
@@ -236,13 +238,13 @@
                                 </div>
                                 <div class="space-y-6">
                                     <div class="group"><div class="flex justify-between items-center mb-2 px-1"><span class="text-[11px] font-black text-c_audio uppercase tracking-widest">AudioSetCaps</span><span class="text-[9px] text-slate-700 font-bold uppercase italic tracking-tighter">Limited Depth</span></div>
-                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_audio/30 transition-all">"${item.audioset}"</div></div>
+                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_audio/30 transition-all shadow-sm">"${item.audioset}"</div></div>
                                     
                                     <div class="group"><div class="flex justify-between items-center mb-2 px-1"><span class="text-[11px] font-black text-c_wav uppercase tracking-widest">WavCaps</span><span class="text-[9px] text-slate-700 font-bold uppercase italic tracking-tighter">Brief Summary</span></div>
-                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_wav/30 transition-all">"${item.wavcaps}"</div></div>
+                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_wav/30 transition-all shadow-sm">"${item.wavcaps}"</div></div>
                                     
                                     <div class="group"><div class="flex justify-between items-center mb-2 px-1"><span class="text-[11px] font-black text-c_auto uppercase tracking-widest">Auto-ACD</span><span class="text-[9px] text-slate-700 font-bold uppercase italic tracking-tighter">Partial Context</span></div>
-                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_auto/30 transition-all">"${item.autoacd}"</div></div>
+                                    <div class="p-5 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_auto/30 transition-all shadow-sm">"${item.autoacd}"</div></div>
                                 </div>
                             </div>
                         </div>
