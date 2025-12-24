@@ -16,6 +16,7 @@
                         c_audio: '#10b981',  // AudioSetCaps (Emerald)
                         c_wav: '#f59e0b',    // WavCaps (Amber)
                         c_auto: '#f43f5e',   // Auto-ACD (Rose)
+                        hf: '#ffbd2e',       // Hugging Face Yellow
                         darkbg: '#0f172a', 
                         cardbg: '#1e293b'
                     },
@@ -34,26 +35,23 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         
-        .eva-card-glow {
-            position: relative;
-        }
+        .eva-card-glow { position: relative; }
         .eva-card-glow::before {
             content: '';
             position: absolute;
             inset: -1px;
             background: linear-gradient(90deg, #6366f1, transparent, transparent);
-            border-radius: 1.5rem;
+            border-radius: 2rem;
             z-index: -1;
             opacity: 0.3;
         }
 
-        .audio-custom::-webkit-media-controls-panel {
-            background-color: #1e293b;
-        }
+        .audio-custom::-webkit-media-controls-panel { background-color: #1e293b; }
         .audio-custom::-webkit-media-controls-current-time-display,
-        .audio-custom::-webkit-media-controls-time-remaining-display {
-            color: #ffffff;
-        }
+        .audio-custom::-webkit-media-controls-time-remaining-display { color: #ffffff; }
+
+        /* Hugging Face Emoji Style */
+        .hf-logo { width: 1.25rem; height: 1.25rem; vertical-align: middle; margin-right: 0.5rem; }
     </style>
 </head>
 <body class="bg-darkbg text-slate-200 min-h-screen font-sans selection:bg-brand selection:text-white flex flex-col">
@@ -67,17 +65,20 @@
                 </div>
                 <div>
                     <span class="text-xl font-extrabold tracking-tighter text-white block leading-none">EvA</span>
-                    <span class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Perception Explorer</span>
+                    <span class="text-[10px] text-slate-500 font-mono uppercase tracking-widest leading-none">Perception Explorer</span>
                 </div>
             </div>
-            <div class="flex items-center gap-6">
-                <div class="hidden md:flex gap-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    <span class="text-brand">Comparison Mode</span>
-                    <span class="opacity-30">|</span>
-                    <span>2025 v1.0</span>
-                </div>
-                <a href="#" class="text-slate-400 hover:text-white transition-colors text-xl">
-                    <i class="fa-brands fa-github"></i>
+            
+            <div class="flex items-center gap-3">
+                <!-- GitHub -->
+                <a href="https://github.com/satsuki2486441738/EvA" target="_blank" 
+                   class="hidden md:flex items-center px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-white transition-all">
+                    <i class="fa-brands fa-github mr-2"></i> GitHub
+                </a>
+                <!-- Hugging Face -->
+                <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" target="_blank" 
+                   class="flex items-center px-4 py-2 rounded-full bg-hf hover:bg-[#eab308] text-black text-sm font-bold transition-all shadow-lg shadow-hf/20">
+                    <span class="hf-logo">🤗</span> Hugging Face
                 </a>
             </div>
         </div>
@@ -89,18 +90,28 @@
             <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tighter">
                 Perception <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand to-indigo-400">Benchmarking</span>
             </h1>
-            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
                 Comparing <span class="text-white font-semibold underline decoration-brand decoration-2 underline-offset-4">EvA-Perception</span> with state-of-the-art baselines. 
                 Focusing on temporal details and ASR-integrated audio understanding.
             </p>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <a href="https://github.com/satsuki2486441738/EvA" target="_blank" class="flex items-center px-6 py-3 rounded-xl bg-indigo-600/10 border border-indigo-500/30 text-brand font-bold hover:bg-indigo-600/20 transition-all">
+                    <i class="fa-solid fa-code mr-2"></i> Project Code
+                </a>
+                <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" target="_blank" class="flex items-center px-6 py-3 rounded-xl bg-hf/10 border border-hf/30 text-hf font-bold hover:bg-hf/20 transition-all">
+                    <i class="fa-solid fa-database mr-2"></i> Dataset (v2)
+                </a>
+            </div>
             
             <!-- Search Bar -->
             <div class="relative max-w-2xl mx-auto group">
                 <div class="absolute -inset-1 bg-gradient-to-r from-brand/20 to-indigo-500/20 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-500"></div>
                 <div class="relative">
                     <input type="text" id="searchInput"
-                        class="w-full bg-slate-900 border border-slate-700/50 text-white rounded-2xl focus:ring-2 focus:ring-brand focus:border-transparent block pl-14 p-5 shadow-2xl transition-all placeholder-slate-600" 
-                        placeholder="Search by ID or keywords (e.g. 'music', 'engine')...">
+                        class="w-full bg-slate-900 border border-slate-700/50 text-white rounded-2xl focus:ring-2 focus:ring-brand focus:border-transparent block pl-14 p-5 shadow-2xl transition-all placeholder-slate-600 text-base" 
+                        placeholder="Search by ID or keywords (e.g. 'music', 'Hindi')...">
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                         <i class="fa-solid fa-magnifying-glass text-slate-500 group-focus-within:text-brand transition-colors"></i>
                     </div>
@@ -112,28 +123,30 @@
         </div>
 
         <!-- Data Grid -->
-        <div id="dataGrid" class="space-y-12">
-            <!-- Cards will be injected here -->
+        <div id="dataGrid" class="space-y-12 max-w-6xl mx-auto">
+            <!-- Cards injected by JS -->
         </div>
 
         <!-- Empty State -->
         <div id="noResults" class="hidden text-center py-32">
-            <div class="inline-block p-6 rounded-3xl bg-slate-900 border border-slate-800 mb-6">
-                <i class="fa-solid fa-magnifying-glass-chart text-5xl text-slate-700"></i>
-            </div>
+            <i class="fa-solid fa-magnifying-glass-chart text-5xl text-slate-700 mb-6"></i>
             <h3 class="text-xl text-white font-bold">No results found</h3>
             <p class="text-slate-500">Try searching for a different ID or audio content.</p>
         </div>
     </main>
 
-    <footer class="border-t border-slate-900 py-12 text-center bg-slate-950/50">
-        <p class="text-slate-500 text-sm">&copy; 2025 EvA-Perception Project. High-fidelity Audio Understanding.</p>
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 bg-slate-950/50 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="flex justify-center gap-8 mb-8 text-slate-500">
+                <a href="https://github.com/satsuki2486441738/EvA" class="hover:text-brand"><i class="fa-brands fa-github text-2xl"></i></a>
+                <a href="https://huggingface.co/datasets/SatsukiVie/EvA-v2" class="hover:text-hf"><span class="text-2xl">🤗</span></a>
+            </div>
+            <p class="text-slate-500 text-sm font-medium">© 2025 EvA-Perception Project. Licensed under Apache 2.0.</p>
+        </div>
     </footer>
 
     <script>
-        // ==========================================
-        // 1. Data (Cleaned & Focused)
-        // ==========================================
         const rawData = [
             {
                 "id": "01Kf9T7o2Zs",
@@ -161,15 +174,11 @@
             }
         ];
 
-        // ==========================================
-        // 2. Logic
-        // ==========================================
         const grid = document.getElementById('dataGrid');
         const searchInput = document.getElementById('searchInput');
         const countBadge = document.getElementById('countBadge');
         const noResults = document.getElementById('noResults');
 
-        // Copy Function
         window.copyText = function(btn, text) {
             navigator.clipboard.writeText(text).then(() => {
                 const icon = btn.querySelector('i');
@@ -181,107 +190,53 @@
         function renderCards(data) {
             grid.innerHTML = '';
             countBadge.textContent = `${data.length} SAMPLES`;
-
-            if (data.length === 0) {
-                noResults.classList.remove('hidden');
-                return;
-            } else {
-                noResults.classList.add('hidden');
-            }
+            if (data.length === 0) { noResults.classList.remove('hidden'); return; } 
+            noResults.classList.add('hidden');
 
             data.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'eva-card-glow bg-cardbg rounded-[2rem] border border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 hover:border-slate-700';
-                
+                card.className = 'eva-card-glow bg-cardbg rounded-[2rem] border border-slate-800 shadow-2xl overflow-hidden transition-all duration-500';
                 card.innerHTML = `
-                    <!-- Top Bar -->
                     <div class="px-8 py-5 bg-slate-900/50 border-b border-slate-800 flex flex-wrap items-center justify-between gap-6">
                         <div class="flex items-center gap-4">
-                            <div class="flex flex-col">
-                                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Sample ID</span>
-                                <span class="text-white font-mono font-bold tracking-tight">${item.id}</span>
-                            </div>
+                            <span class="text-white font-mono font-bold px-3 py-1 bg-slate-800 rounded-lg text-sm border border-slate-700">${item.id}</span>
                         </div>
                         <div class="flex-grow max-w-xl">
-                            <audio controls class="audio-custom w-full h-10 rounded-full">
-                                <source src="${item.audio}" type="audio/wav">
-                            </audio>
+                            <audio controls class="audio-custom w-full h-10 rounded-full shadow-inner"><source src="${item.audio}" type="audio/wav"></audio>
                         </div>
-                        <a href="${item.audio}" download class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-brand hover:text-white transition-all">
-                            <i class="fa-solid fa-download text-sm"></i>
-                        </a>
+                        <a href="${item.audio}" download class="text-slate-500 hover:text-brand transition-colors"><i class="fa-solid fa-cloud-arrow-down text-xl"></i></a>
                     </div>
-
-                    <!-- Comparison Content -->
-                    <div class="p-8 md:p-10">
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                            
-                            <!-- Left: EvA (Ours) -->
+                    <div class="p-8 md:p-10 lg:p-12">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
                             <div class="lg:col-span-7 space-y-6">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center">
-                                            <i class="fa-solid fa-wand-magic-sparkles text-brand text-sm"></i>
-                                        </div>
-                                        <h3 class="text-lg font-bold text-white tracking-tight uppercase">EvA Perception <span class="text-slate-600 ml-2 font-normal text-sm lowercase tracking-normal italic">(ours)</span></h3>
+                                        <div class="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles text-brand text-sm"></i></div>
+                                        <h3 class="text-lg font-bold text-white tracking-tight uppercase">EvA Perception</h3>
                                     </div>
-                                    <button onclick="copyText(this, \`${item.eva}\`)" class="text-slate-600 hover:text-brand transition-colors p-2">
-                                        <i class="fa-regular fa-copy"></i>
-                                    </button>
+                                    <button onclick="copyText(this, \`${item.eva}\`)" class="text-slate-600 hover:text-brand transition-colors"><i class="fa-regular fa-copy text-lg"></i></button>
                                 </div>
                                 <div class="relative group">
                                     <div class="absolute -inset-1 bg-gradient-to-r from-brand/20 to-transparent rounded-2xl blur opacity-20"></div>
-                                    <div class="relative bg-slate-900/80 p-8 rounded-3xl border border-brand/20 text-xl text-slate-100 leading-[1.6] font-light shadow-inner">
+                                    <div class="relative bg-slate-900/80 p-8 rounded-3xl border border-brand/30 text-xl text-slate-100 leading-relaxed font-light shadow-2xl tracking-tight">
                                         ${item.eva}
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-3 py-1 rounded-full uppercase">Temporal-Aware</span>
-                                    <span class="text-[10px] font-bold bg-slate-800 text-slate-400 px-3 py-1 rounded-full uppercase">ASR-Integrated</span>
+                                    <span class="text-[10px] font-bold bg-indigo-500/10 text-brand px-3 py-1 rounded-full border border-indigo-500/20 uppercase">Detailed Events</span>
+                                    <span class="text-[10px] font-bold bg-indigo-500/10 text-brand px-3 py-1 rounded-full border border-indigo-500/20 uppercase">ASR Transcripts</span>
                                 </div>
                             </div>
-
-                            <!-- Right: Baselines -->
-                            <div class="lg:col-span-5 space-y-8">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-px flex-grow bg-slate-800"></div>
-                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Baselines</span>
-                                    <div class="h-px flex-grow bg-slate-800"></div>
+                            <div class="lg:col-span-5 space-y-6">
+                                <div class="flex items-center gap-4 mb-2"><div class="h-px flex-grow bg-slate-800"></div><span class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Baselines</span><div class="h-px flex-grow bg-slate-800"></div></div>
+                                <div class="space-y-4">
+                                    <div class="group"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-c_audio uppercase tracking-widest">AudioSetCaps</span></div>
+                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_audio/30 transition-colors">"${item.audioset}"</div></div>
+                                    <div class="group"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-c_wav uppercase tracking-widest">WavCaps</span></div>
+                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_wav/30 transition-colors">"${item.wavcaps}"</div></div>
+                                    <div class="group"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-c_auto uppercase tracking-widest">Auto-ACD</span></div>
+                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_auto/30 transition-colors">"${item.autoacd}"</div></div>
                                 </div>
-
-                                <!-- AudioSetCaps -->
-                                <div class="group">
-                                    <div class="flex justify-between items-center mb-2 px-1">
-                                        <span class="text-xs font-bold text-c_audio tracking-widest uppercase">AudioSetCaps</span>
-                                        <span class="text-[10px] text-slate-600 font-mono italic">General Descriptions</span>
-                                    </div>
-                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_audio/30 transition-colors">
-                                        "${item.audioset}"
-                                    </div>
-                                </div>
-
-                                <!-- WavCaps -->
-                                <div class="group">
-                                    <div class="flex justify-between items-center mb-2 px-1">
-                                        <span class="text-xs font-bold text-c_wav tracking-widest uppercase">WavCaps</span>
-                                        <span class="text-[10px] text-slate-600 font-mono italic">Summarized / Short</span>
-                                    </div>
-                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_wav/30 transition-colors">
-                                        "${item.wavcaps}"
-                                    </div>
-                                </div>
-
-                                <!-- Auto-ACD -->
-                                <div class="group">
-                                    <div class="flex justify-between items-center mb-2 px-1">
-                                        <span class="text-xs font-bold text-c_auto tracking-widest uppercase">Auto-ACD</span>
-                                        <span class="text-[10px] text-slate-600 font-mono italic">Low Complexity</span>
-                                    </div>
-                                    <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl text-slate-400 text-sm italic leading-relaxed group-hover:border-c_auto/30 transition-colors">
-                                        "${item.autoacd}"
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -290,18 +245,12 @@
             });
         }
 
-        // Search Filter Logic
         searchInput.addEventListener('input', (e) => {
             const kw = e.target.value.toLowerCase().trim();
-            const filtered = rawData.filter(i => 
-                i.id.toLowerCase().includes(kw) || 
-                i.eva.toLowerCase().includes(kw) || 
-                i.audioset.toLowerCase().includes(kw)
-            );
+            const filtered = rawData.filter(i => i.id.toLowerCase().includes(kw) || i.eva.toLowerCase().includes(kw));
             renderCards(filtered);
         });
 
-        // Initial Render
         renderCards(rawData);
     </script>
 </body>
